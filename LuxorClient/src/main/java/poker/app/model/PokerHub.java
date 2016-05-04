@@ -157,6 +157,8 @@ public class PokerHub extends Hub {
 				 * e.printStackTrace(); } }
 				 */
 				break;
+			case Draw:
+				break;
 			}
 		}
 
