@@ -166,7 +166,7 @@ public class PokerHub extends Hub {
 	}
 
 	private void DealCards(eDrawCount eDrawCount) {
-		CardDraw cd = HubGamePlay.getRule().GetDrawCard(eDrawCount);
+		CardDraw cd = HubGamePlay.getRule().GetCardDraw(eDrawCount);
 
 		// How many cards to draw?
 		for (int iDrawCnt = 0; iDrawCnt < cd.getCardCount().ordinal(); iDrawCnt++) {

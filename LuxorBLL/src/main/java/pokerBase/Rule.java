@@ -195,6 +195,15 @@ public class Rule implements Serializable {
 			}
 		}
 
+		public LinkedList<CardDraw> getCardDraw() {
+			return CardDraw;
+		}
+
+		// Added
+		public CardDraw getCardDraw(int drawNum) {
+			return this.CardDraw.get(drawNum);
+		}
+
 		public int GetMaxNumberOfPlayers() {
 			return this.MaxNumberOfPlayers;
 		}
