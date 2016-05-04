@@ -39,7 +39,7 @@ public class PokerHub extends Hub {
 
 	protected void playerConnected(int playerID) {
 
-		if (playerID == 2) {
+		if (playerID > HubGamePlay.getRule().GetMaxNumberOfPlayers()) {
 			shutdownServerSocket();
 		}
 	}
