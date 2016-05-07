@@ -37,15 +37,26 @@ public class PokerHub extends Hub {
 		super(port);
 	}
 
+	// Modified for extra credit
 	protected void playerConnected(int playerID) {
-
-		if (playerID > HubGamePlay.getRule().GetMaxNumberOfPlayers()) {
+		if (this.nPlayerConnections() == HubGamePlay.getRule().GetMaxNumberOfPlayers()) {
 			shutdownServerSocket();
 		}
 	}
 
+	// Modified for extra credit
 	protected void playerDisconnected(int playerID) {
-		shutDownHub();
+		int nOld = this.nPlayerConnections();
+		int nMax = HubGamePlay.getRule().GetMaxNumberOfPlayers();
+		this.removePlayerConnection(playerID);
+		if (this.nPlayerConnections() == nMax - 1) {
+			try {
+				this.restartServer();
+			} catch (IOException e) {
+			}
+		} else if (this.nPlayerConnections() == 0) {
+			this.shutDownHub();
+		}
 	}
 
 	protected void messageReceived(int ClientID, Object message) {
@@ -70,7 +81,6 @@ public class PokerHub extends Hub {
 				HubPokerTable.RemovePlayerFromTable(act.getPlayer());
 				sendToAll(HubPokerTable);
 				break;
-
 			case StartGame:
 				// System.out.println("Starting Game!");
 				resetOutput();

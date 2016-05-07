@@ -84,6 +84,8 @@ public class Hub {
     private Thread serverThread;        // Accepts connections on serverSocket
     volatile private boolean shutdown;  // Set to true when the Hub is not listening.
     
+    private int port; // Added by warpB
+    
     private int nextClientID = 1;  // The id number that will be assigned to
                                    // the next client that connects.
     
@@ -94,6 +96,7 @@ public class Hub {
      * @throws IOException if it is not possible to create a listening socket on the specified port.
      */
     public Hub(int port) throws IOException {
+    	this.port = port;
         playerConnections = new TreeMap<Integer, ConnectionToClient>();
         incomingMessages = new LinkedBlockingQueue<Message>();
         serverSocket = new ServerSocket(port);
@@ -222,8 +225,44 @@ public class Hub {
         serverThread = new ServerThread();
         serverThread.start();
     }
-
     
+    
+    /* The next three methods were added to support the extra credit
+     * assignment, as was the attribute private int port.
+     */
+    
+    /**
+     * Return the number of player connections.
+     * Added by warpB
+     * @return
+     */
+    public int nPlayerConnections() {
+    	return this.getPlayerList().length;
+    }
+    
+    /**
+     * Restart the server using the same port that was specified in the constructor.
+     * Added by warpB
+     * @throws IOException if it is impossible to create a listening socket.
+     */
+    public void restartServer() throws IOException {
+    	this.restartServer(this.port);
+    }
+
+    /**
+     * Remove the connection for the specified player
+     * Added by warpB
+     * @param playerID
+     */
+    public void removePlayerConnection(int playerID) {
+    	if (this.playerConnections.containsKey(playerID)) {
+    		this.playerConnections.remove(playerID);
+    	}
+    }
+    
+    /* End of methods modified by warpB */
+    
+  
     /**
      *  Disconnects all currently connected clients and stops accepting new client
      *  requests.  It is still possible to restart listening after this method has
