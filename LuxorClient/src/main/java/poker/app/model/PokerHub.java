@@ -21,6 +21,7 @@ import pokerBase.Player;
 import pokerBase.Rule;
 import pokerBase.Table;
 import pokerEnums.eAction;
+import pokerEnums.eCardVisibility;
 import pokerEnums.eDrawCount;
 import pokerEnums.eGame;
 import pokerEnums.eGameState;
@@ -176,19 +177,24 @@ public class PokerHub extends Hub {
 	}
 
 	private void DealCards(eDrawCount eDrawCount) {
-		CardDraw cd = HubGamePlay.getRule().GetCardDraw(eDrawCount);
+		CardDraw cd = HubGamePlay.getRule().getCardDraw(eDrawCount.getDrawNo());
+		Deck dk = HubGamePlay.getGameDeck();
 
 		// How many cards to draw?
 		for (int iDrawCnt = 0; iDrawCnt < cd.getCardCount().ordinal(); iDrawCnt++) {
 			// What's the order of the draw?
 			for (int iDrawOrder : HubGamePlay.getiActOrder()) {
-				// Is there a player seated at that position? Is the hand
-				// folded?
-				if ((HubGamePlay.getPlayerByPosition(iDrawOrder) != null)
-						&& (!HubGamePlay.getPlayerHand(HubGamePlay.getPlayerByPosition(iDrawOrder)).isFolded())) {
+				// Is there a player seated at that position?
+				Player aPlayer = HubGamePlay.getPlayerByPosition(iDrawOrder);
+				if (aPlayer == null) {
+					continue;
+				// Is the hand folded?
+				} else if (HubGamePlay.playerGPPH(aPlayer).isFolded()) {
+					continue;
+				} else {
 					try {
-						HubGamePlay.getPlayerHand(HubGamePlay.getPlayerByPosition(iDrawOrder))
-								.Draw(HubGamePlay.getGameDeck());
+						eCardVisibility visibility = cd.getCardVisibility();
+						HubGamePlay.playerGPPH(aPlayer).addCardToHand(dk.Draw(), visibility);
 					} catch (DeckException e) {
 						e.printStackTrace();
 					}

@@ -28,7 +28,7 @@ public class GamePlay implements Serializable   {
 		this.setGameDealer(GameDealer);
 		this.rle = rle;
 	}
-
+	
 	public UUID getGameID() {
 		return GameID;
 	}
@@ -170,20 +170,17 @@ public class GamePlay implements Serializable   {
 	}
 	*/
 	
-/*	public GamePlayPlayerHand FindPlayerGame(GamePlay gme, Player p)
-	{
-		GamePlayPlayerHand GPPHReturn = null;
+	public GamePlayPlayerHand playerGPPH(Player aPlayer) {
 		
-	
-		for (GamePlayPlayerHand GPPH: GamePlayerHand)
-		{
-			if (p.getiPlayerPosition() == GPPH.getPlayer().getiPlayerPosition())
-			{
+		GamePlayPlayerHand GPPHReturn = null;
+		for (GamePlayPlayerHand GPPH : GamePlayerHand) {
+			if (aPlayer.getiPlayerPosition() == GPPH.getPlayer().getiPlayerPosition()) {
 				GPPHReturn = GPPH;
+				break;
 			}
 		}
 		return GPPHReturn;
-	}*/
+	}
 	
 	
 }

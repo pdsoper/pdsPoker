@@ -1,12 +1,18 @@
 package pokerBase;
 
+import java.util.HashMap;
+
+import pokerEnums.eCardVisibility;
+
 public class GamePlayPlayerHand {
 
 	private GamePlay game = null;
 	private Player player = null;
 	private Hand hand = null;
 	private Hand BestHand = null;
-			
+
+	private boolean folded = false;
+	private HashMap<Card, eCardVisibility> cardVisibility = new HashMap<Card, eCardVisibility>();
 	
 	private Player WinningPlayer = null;
 	
@@ -16,6 +22,14 @@ public class GamePlayPlayerHand {
 		this.player = p;
 	}
 
+	public boolean isFolded() {
+		return this.folded;
+	}
+	
+	public void setFolded() {
+		this.folded = true;
+	}
+	
 	public GamePlay getGame() {
 		return game;
 	}
@@ -40,9 +54,15 @@ public class GamePlayPlayerHand {
 		this.hand = hand;
 	}
 
-	public void addCardToHand( Card c)
+	public void addCardToHand(Card c, eCardVisibility visibility )
 	{
-		getHand().AddCardToHand(c);
+		this.hand.AddCardToHand(c);
+		this.cardVisibility.put(c, visibility);
+	}
+	
+	public boolean playerCardVisible(Player p, Card c) {
+		return this.player.equals(p) || 
+			this.cardVisibility.get(c) == eCardVisibility.VisibleEveryone;
 	}
 	
 	public Player getWinningPlayer() {
