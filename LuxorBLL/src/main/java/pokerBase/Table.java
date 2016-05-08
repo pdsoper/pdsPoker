@@ -20,7 +20,7 @@ public class Table implements Serializable {
 	private UUID TableID;
 	
 	@XmlElement
-	private HashMap HashMapPlayer = new HashMap<UUID, Player>();
+	private HashMap<UUID, Player> HashMapPlayer = new HashMap<UUID, Player>();
 	
 	public Table()
 	{

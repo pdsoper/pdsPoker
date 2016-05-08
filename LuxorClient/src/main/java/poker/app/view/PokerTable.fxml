@@ -135,7 +135,6 @@
                      <children>
                         <Button id="btnStartGame" fx:id="btnStartGame" mnemonicParsing="false" onAction="#btnStart_Click" prefWidth="80.0" text="Start" />
                         <Button id="btnDeal" mnemonicParsing="false" onAction="#btnDeal_Click" prefWidth="80.0" text="Deal" />
-                        <Button fx:id="btnDraw" mnemonicParsing="false" onAction="#btnDraw_Click" text="Draw" />
                      </children>
                   </HBox>
                </children>

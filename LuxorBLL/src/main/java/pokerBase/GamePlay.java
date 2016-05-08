@@ -29,6 +29,14 @@ public class GamePlay implements Serializable   {
 		this.rle = rle;
 	}
 	
+	public void initializeHands() {
+		this.GamePlayerHand.clear();
+		for (Player p : this.hmGamePlayers.values()) {
+			this.GamePlayerHand.add(new GamePlayPlayerHand(this, p));
+		}
+		this.GameCommonHand.clear();
+	}
+	
 	public UUID getGameID() {
 		return GameID;
 	}
@@ -54,6 +62,7 @@ public class GamePlay implements Serializable   {
 	{
 		this.hmGamePlayers.put(p.getPlayerID(),p);
 	}
+	
 	public Player getGamePlayer(UUID PlayerID)
 	{
 		return (Player) this.hmGamePlayers.get(PlayerID);
@@ -92,7 +101,6 @@ public class GamePlay implements Serializable   {
 	public void setiActOrder(int[] iActOrder) {
 		this.iActOrder = iActOrder;
 	}
-
 	
 	public Player getPlayerNextToAct() {
 		return PlayerNextToAct;
@@ -174,7 +182,7 @@ public class GamePlay implements Serializable   {
 		
 		GamePlayPlayerHand GPPHReturn = null;
 		for (GamePlayPlayerHand GPPH : GamePlayerHand) {
-			if (aPlayer.getiPlayerPosition() == GPPH.getPlayer().getiPlayerPosition()) {
+			if (aPlayer.equals(GPPH.getPlayer())) {
 				GPPHReturn = GPPH;
 				break;
 			}
@@ -182,5 +190,12 @@ public class GamePlay implements Serializable   {
 		return GPPHReturn;
 	}
 	
+	public String toString() {
+		String ans = "";
+		for (GamePlayPlayerHand GPPH : GamePlayerHand) {
+			ans += GPPH.toString() + "\n";
+		}
+		return ans;
+	}
 	
 }

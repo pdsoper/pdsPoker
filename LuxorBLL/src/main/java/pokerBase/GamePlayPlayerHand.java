@@ -1,10 +1,11 @@
 package pokerBase;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 import pokerEnums.eCardVisibility;
 
-public class GamePlayPlayerHand {
+public class GamePlayPlayerHand implements Serializable {
 
 	private GamePlay game = null;
 	private Player player = null;
@@ -17,9 +18,11 @@ public class GamePlayPlayerHand {
 	private Player WinningPlayer = null;
 	
 	public GamePlayPlayerHand(GamePlay gme, Player p) {
-	
 		this.game = gme;
 		this.player = p;
+		this.hand = new Hand();
+		this.folded = false;
+		
 	}
 
 	public boolean isFolded() {
@@ -81,5 +84,7 @@ public class GamePlayPlayerHand {
 		BestHand = bestHand;
 	}
 
-	
+	public String toString() {
+		return this.player.toString() + "\n" + this.hand.toString();
+	}
 }

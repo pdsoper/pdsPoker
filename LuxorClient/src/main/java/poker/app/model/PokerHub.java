@@ -33,6 +33,7 @@ public class PokerHub extends Hub {
 	private int iDealNbr = 0;
 	// private PokerGameState state;
 	private eGameState eGameState;
+	private eDrawCount currentDraw;
 
 	public PokerHub(int port) throws IOException {
 		super(port);
@@ -40,7 +41,7 @@ public class PokerHub extends Hub {
 
 	// Modified for extra credit
 	protected void playerConnected(int playerID) {
-		if (this.nPlayerConnections() == HubGamePlay.getRule().GetMaxNumberOfPlayers()) {
+		if (HubGamePlay != null && this.nPlayerConnections() == HubGamePlay.getRule().GetMaxNumberOfPlayers()) {
 			shutdownServerSocket();
 		}
 	}
@@ -117,6 +118,7 @@ public class PokerHub extends Hub {
 				// to the game
 				// < 5 lines of code
 				HubGamePlay.setGamePlayers(HubPokerTable.getHashPlayers());
+				HubGamePlay.initializeHands();
 
 				// GamePlay has a deck... create the deck based on the game's
 				// rules (the rule
@@ -151,33 +153,35 @@ public class PokerHub extends Hub {
 				}
 
 				// Deal out the first round
-				DealCards(eDrawCount.FIRST);
+				this.currentDraw = eDrawCount.FIRST;
+				DealCards();
 
 				// Send the state of the game back to the players
 
 				sendToAll(HubGamePlay);
 				break;
 			case Deal:
-
-				/*
-				 * int iCardstoDraw[] = HubGamePlay.getRule().getiCardsToDraw();
-				 * int iDrawCount = iCardstoDraw[iDealNbr];
-				 * 
-				 * for (int i = 0; i<iDrawCount; i++) { try { Card c =
-				 * HubGamePlay.getGameDeck().Draw(); } catch (DeckException e) {
-				 * e.printStackTrace(); } }
-				 */
-				break;
-			case Draw:
+				if (this.currentDraw.getDrawNo() > HubGamePlay.getRule().getTotalCardsToDraw()) {
+					// TODO Score hand
+				} else {
+					this.currentDraw = this.currentDraw.next();
+					DealCards();
+				}
+				sendToAll(HubGamePlay);
 				break;
 			}
 		}
 
+		if (HubGamePlay != null) {
+			System.out.println(this.currentDraw + " draw");
+			System.out.println(HubGamePlay);
+		}
+		
 		// System.out.println("Message Received by Hub");
 	}
 
-	private void DealCards(eDrawCount eDrawCount) {
-		CardDraw cd = HubGamePlay.getRule().getCardDraw(eDrawCount.getDrawNo());
+	private void DealCards() {
+		CardDraw cd = HubGamePlay.getRule().getCardDraw(this.currentDraw);
 		Deck dk = HubGamePlay.getGameDeck();
 
 		// How many cards to draw?

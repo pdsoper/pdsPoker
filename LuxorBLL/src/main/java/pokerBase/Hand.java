@@ -19,10 +19,13 @@ import exceptions.HandException;
 import pokerEnums.*;
 
 import static java.lang.System.out;
+
+import java.io.Serializable;
+
 import static java.lang.System.err;
 
 @XmlRootElement
-public class Hand  {
+public class Hand implements Serializable {
 
 	@XmlElement(name = "Card")
 	private ArrayList<Card> CardsInHand;
@@ -681,5 +684,14 @@ public class Hand  {
 			return 0;
 		}
 	};
+	
+	public String toString() {
+		String ans = "";
+		Collections.sort(this.CardsInHand);
+		for (Card c : this.CardsInHand) {
+			ans += c.toString() + " ";
+		}
+		return ans;
+	}
 
 }

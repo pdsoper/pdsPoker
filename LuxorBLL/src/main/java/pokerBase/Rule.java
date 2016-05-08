@@ -25,7 +25,7 @@ public class Rule implements Serializable {
 		private int CommunityCardsMax;
 		private int PossibleHandCombinations;
 		private ArrayList<Card> WildCards = new ArrayList<Card>();
-		private HashMap hmCardDraw = new HashMap<Integer, CardDraw>();
+		private HashMap<eDrawCount, CardDraw> hmCardDraw = new HashMap<eDrawCount, CardDraw>();
 		
 		private LinkedList<CardDraw> CardDraw = new LinkedList<CardDraw>();
 		private eGame Game;
@@ -46,13 +46,12 @@ public class Rule implements Serializable {
 				this.hmCardDraw.put(eDrawCount.SECOND, new CardDraw(eCardCount.One,eCardDestination.Player,eCardVisibility.VisibleMe));
 				this.hmCardDraw.put(eDrawCount.THIRD, new CardDraw(eCardCount.One,eCardDestination.Player,eCardVisibility.VisibleMe));
 				this.hmCardDraw.put(eDrawCount.FOURTH, new CardDraw(eCardCount.One,eCardDestination.Player,eCardVisibility.VisibleMe));
-				
 				break;
 			}
 			case FiveStudOneJoker: {
 				this.MaxNumberOfPlayers = 4;
 				this.PlayerNumberOfCards = 5;
-				this.NumberOfJokers = 21;
+				this.NumberOfJokers = 1;
 				this.PlayerCardsMin = 5;
 				this.PlayerCardsMax = 5;			
 				this.CommunityCardsMin = 0;
@@ -62,7 +61,6 @@ public class Rule implements Serializable {
 				this.hmCardDraw.put(eDrawCount.SECOND,new CardDraw(eCardCount.One,eCardDestination.Player,eCardVisibility.VisibleMe));
 				this.hmCardDraw.put(eDrawCount.THIRD,new CardDraw(eCardCount.One,eCardDestination.Player,eCardVisibility.VisibleMe));
 				this.hmCardDraw.put(eDrawCount.FOURTH,new CardDraw(eCardCount.One,eCardDestination.Player,eCardVisibility.VisibleMe));
-		
 				break;
 			}
 			case FiveStudTwoJoker: {
@@ -78,7 +76,6 @@ public class Rule implements Serializable {
 				this.hmCardDraw.put(eDrawCount.SECOND,new CardDraw(eCardCount.One,eCardDestination.Player,eCardVisibility.VisibleMe));
 				this.hmCardDraw.put(eDrawCount.THIRD,new CardDraw(eCardCount.One,eCardDestination.Player,eCardVisibility.VisibleMe));
 				this.hmCardDraw.put(eDrawCount.FOURTH,new CardDraw(eCardCount.One,eCardDestination.Player,eCardVisibility.VisibleMe));
-			
 				break;
 			}
 			case TexasHoldEm: {
@@ -126,7 +123,6 @@ public class Rule implements Serializable {
 				this.hmCardDraw.put(eDrawCount.THIRD,new CardDraw(eCardCount.Three,eCardDestination.Community,eCardVisibility.VisibleEveryone));
 				this.hmCardDraw.put(eDrawCount.FOURTH,new CardDraw(eCardCount.One,eCardDestination.Community,eCardVisibility.VisibleEveryone));
 				this.hmCardDraw.put(eDrawCount.FIFTH,new CardDraw(eCardCount.One,eCardDestination.Community,eCardVisibility.VisibleEveryone));
-			
 				break;
 			}		
 			case SevenDraw: {
@@ -144,8 +140,6 @@ public class Rule implements Serializable {
 				this.hmCardDraw.put(eDrawCount.FOURTH,new CardDraw(eCardCount.One,eCardDestination.Player,eCardVisibility.VisibleMe));
 				this.hmCardDraw.put(eDrawCount.FIFTH,new CardDraw(eCardCount.One,eCardDestination.Player,eCardVisibility.VisibleMe));
 				this.hmCardDraw.put(eDrawCount.SIXTH,new CardDraw(eCardCount.One,eCardDestination.Player,eCardVisibility.VisibleMe));				
-				
-				
 				break;
 			}		
 			case DeucesWild: {
@@ -165,7 +159,6 @@ public class Rule implements Serializable {
 				this.hmCardDraw.put(eDrawCount.SECOND,new CardDraw(eCardCount.One,eCardDestination.Player,eCardVisibility.VisibleMe));
 				this.hmCardDraw.put(eDrawCount.THIRD,new CardDraw(eCardCount.One,eCardDestination.Player,eCardVisibility.VisibleMe));
 				this.hmCardDraw.put(eDrawCount.FOURTH,new CardDraw(eCardCount.One,eCardDestination.Player,eCardVisibility.VisibleMe));
-			
 				break;
 			}
 			case AcesAndEights: {
@@ -189,7 +182,6 @@ public class Rule implements Serializable {
 				this.hmCardDraw.put(eDrawCount.SECOND,new CardDraw(eCardCount.One,eCardDestination.Player,eCardVisibility.VisibleMe));
 				this.hmCardDraw.put(eDrawCount.THIRD,new CardDraw(eCardCount.One,eCardDestination.Player,eCardVisibility.VisibleMe));
 				this.hmCardDraw.put(eDrawCount.FOURTH,new CardDraw(eCardCount.One,eCardDestination.Player,eCardVisibility.VisibleMe));
-						
 				break;
 			}
 			}
@@ -199,9 +191,8 @@ public class Rule implements Serializable {
 			return CardDraw;
 		}
 
-		// Added
-		public CardDraw getCardDraw(int drawNum) {
-			return this.CardDraw.get(drawNum);
+		public CardDraw getCardDraw(eDrawCount edc) {
+			return this.hmCardDraw.get(edc);
 		}
 
 		public int GetMaxNumberOfPlayers() {

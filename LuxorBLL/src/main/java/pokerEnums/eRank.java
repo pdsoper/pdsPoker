@@ -19,6 +19,8 @@ public enum eRank {
 	JOKER(99);
 
 	private int iRankNbr;
+	
+	private static String[] royaltyRankStr = { "J", "Q", "K", "A" };
 
 	private eRank(int iRankNbr) {
 		this.iRankNbr = iRankNbr;
@@ -27,6 +29,16 @@ public enum eRank {
 	@XmlElement
 	public int getiRankNbr() {
 		return iRankNbr;
+	}
+	
+	public String toString() {
+		if (this.iRankNbr < 11) {
+			return String.valueOf(this.iRankNbr);
+		} else if (this.iRankNbr <= 14) {
+			return royaltyRankStr[this.iRankNbr - 11];
+		} else {
+			return "Joker";
+		}
 	}
 
 
