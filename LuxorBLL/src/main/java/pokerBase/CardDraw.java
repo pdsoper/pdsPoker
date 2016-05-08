@@ -6,7 +6,6 @@ import pokerEnums.eCardCount;
 import pokerEnums.eCardDestination;
 import pokerEnums.eCardVisibility;
 
-
 public class CardDraw implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -33,5 +32,10 @@ public class CardDraw implements Serializable {
 		return CardVisibility;
 	}
 	
+	public String toString() {
+		int nCards = this.CardCount.getCardCount();
+		String countStr = String.valueOf(nCards) + ((nCards == 1) ? "card": "cards");
+		return "To " + this.CardDestination + " : " + countStr + ", " + this.CardVisibility;
+	}
 	
 }

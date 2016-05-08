@@ -154,6 +154,7 @@ public class PokerHub extends Hub {
 
 				// Deal out the first round
 				this.currentDraw = eDrawCount.FIRST;
+				System.out.println(this.currentDraw + " draw");
 				DealCards();
 
 				// Send the state of the game back to the players
@@ -165,6 +166,7 @@ public class PokerHub extends Hub {
 					// TODO Score hand
 				} else {
 					this.currentDraw = this.currentDraw.next();
+					System.out.println(this.currentDraw + " draw");
 					DealCards();
 				}
 				sendToAll(HubGamePlay);
@@ -173,7 +175,6 @@ public class PokerHub extends Hub {
 		}
 
 		if (HubGamePlay != null) {
-			System.out.println(this.currentDraw + " draw");
 			System.out.println(HubGamePlay);
 		}
 		
@@ -183,9 +184,12 @@ public class PokerHub extends Hub {
 	private void DealCards() {
 		CardDraw cd = HubGamePlay.getRule().getCardDraw(this.currentDraw);
 		Deck dk = HubGamePlay.getGameDeck();
+		
+		System.out.println(cd);
 
 		// How many cards to draw?
-		for (int iDrawCnt = 0; iDrawCnt < cd.getCardCount().ordinal(); iDrawCnt++) {
+		int nCards = cd.getCardCount().ordinal();
+		for (int iDrawCnt = 0; iDrawCnt <= nCards ; iDrawCnt++) {
 			// What's the order of the draw?
 			for (int iDrawOrder : HubGamePlay.getiActOrder()) {
 				// Is there a player seated at that position?
