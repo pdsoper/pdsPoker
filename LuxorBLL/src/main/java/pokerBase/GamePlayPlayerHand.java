@@ -22,7 +22,6 @@ public class GamePlayPlayerHand implements Serializable {
 		this.player = p;
 		this.hand = new Hand();
 		this.folded = false;
-		
 	}
 
 	public boolean isFolded() {

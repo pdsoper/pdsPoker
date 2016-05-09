@@ -195,6 +195,10 @@ public class Rule implements Serializable {
 			return this.hmCardDraw.get(edc);
 		}
 
+		public boolean hasDrawCount(eDrawCount edc) {
+			return this.hmCardDraw.containsKey(edc);
+		}
+		
 		public int GetMaxNumberOfPlayers() {
 			return this.MaxNumberOfPlayers;
 		}

@@ -188,7 +188,7 @@ public class Hand implements Serializable {
 	 * @return
 	 * @throws HandException
 	 */
-	private static Hand EvaluateHand(Hand h) throws HandException {
+	public static Hand EvaluateHand(Hand h) throws HandException {
 
 		Collections.sort(h.getCardsInHand());
 
@@ -687,9 +687,11 @@ public class Hand implements Serializable {
 	
 	public String toString() {
 		String ans = "";
-		Collections.sort(this.CardsInHand);
 		for (Card c : this.CardsInHand) {
 			ans += c.toString() + " ";
+		}
+		if (this.bScored) {
+			ans += " " + eHandStrength.getStrength(this.HandScore.getHandStrength());
 		}
 		return ans;
 	}

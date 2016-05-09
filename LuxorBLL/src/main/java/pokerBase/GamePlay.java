@@ -2,11 +2,14 @@ package pokerBase;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.UUID;
+
+import exceptions.HandException;
 
 public class GamePlay implements Serializable   {
 
@@ -32,7 +35,8 @@ public class GamePlay implements Serializable   {
 	public void initializeHands() {
 		this.GamePlayerHand.clear();
 		for (Player p : this.hmGamePlayers.values()) {
-			this.GamePlayerHand.add(new GamePlayPlayerHand(this, p));
+			GamePlayPlayerHand gpph = new GamePlayPlayerHand(this, p);
+			this.GamePlayerHand.add(gpph);
 		}
 		this.GameCommonHand.clear();
 	}
@@ -178,8 +182,27 @@ public class GamePlay implements Serializable   {
 	}
 	*/
 	
+	public Player findWinner() throws HandException {
+		boolean firstTime = true;
+		GamePlayPlayerHand winner = null;
+		for (GamePlayPlayerHand gpph : this.GamePlayerHand) {
+			Hand.Evaluate(gpph.getHand());
+			if (firstTime) {
+				winner = gpph;
+				firstTime = false;
+			} else if (Hand.HandRank.compare(winner.getHand(), gpph.getHand()) > 0) {
+				winner = gpph;
+			}
+		}
+		if (winner != null) {
+			for (GamePlayPlayerHand gpph : this.GamePlayerHand) {
+				gpph.setWinningPlayer(winner.getPlayer());
+			}
+		}
+		return winner.getPlayer();
+	}
+	
 	public GamePlayPlayerHand playerGPPH(Player aPlayer) {
-		
 		GamePlayPlayerHand GPPHReturn = null;
 		for (GamePlayPlayerHand GPPH : GamePlayerHand) {
 			if (aPlayer.equals(GPPH.getPlayer())) {
@@ -192,8 +215,8 @@ public class GamePlay implements Serializable   {
 	
 	public String toString() {
 		String ans = "";
-		for (GamePlayPlayerHand GPPH : GamePlayerHand) {
-			ans += GPPH.toString() + "\n";
+		for (GamePlayPlayerHand gpph : GamePlayerHand) {
+			ans += gpph.toString() + "\n";
 		}
 		return ans;
 	}

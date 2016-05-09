@@ -34,7 +34,7 @@ public class CardDraw implements Serializable {
 	
 	public String toString() {
 		int nCards = this.CardCount.getCardCount();
-		String countStr = String.valueOf(nCards) + ((nCards == 1) ? "card": "cards");
+		String countStr = String.valueOf(nCards) + ((nCards == 1) ? " card" : " cards");
 		return "To " + this.CardDestination + " : " + countStr + ", " + this.CardVisibility;
 	}
 	

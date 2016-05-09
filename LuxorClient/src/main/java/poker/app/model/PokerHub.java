@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import exceptions.DeckException;
+import exceptions.HandException;
 import netgame.common.Hub;
 import pokerBase.Action;
 import pokerBase.Card;
@@ -162,12 +163,12 @@ public class PokerHub extends Hub {
 				sendToAll(HubGamePlay);
 				break;
 			case Deal:
-				if (this.currentDraw.getDrawNo() > HubGamePlay.getRule().getTotalCardsToDraw()) {
-					// TODO Score hand
-				} else {
-					this.currentDraw = this.currentDraw.next();
+				this.currentDraw = this.currentDraw.next();
+				if (HubGamePlay.getRule().hasDrawCount(this.currentDraw)) {
 					System.out.println(this.currentDraw + " draw");
 					DealCards();
+				} else {
+					this.ScoreHands();
 				}
 				sendToAll(HubGamePlay);
 				break;
@@ -181,6 +182,17 @@ public class PokerHub extends Hub {
 		// System.out.println("Message Received by Hub");
 	}
 
+	private void ScoreHands() {
+		Player winner = null;
+		try {
+			winner = HubGamePlay.findWinner();
+			System.out.println(winner.getPlayerName() + " is the winner");
+		} catch (HandException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	private void DealCards() {
 		CardDraw cd = HubGamePlay.getRule().getCardDraw(this.currentDraw);
 		Deck dk = HubGamePlay.getGameDeck();

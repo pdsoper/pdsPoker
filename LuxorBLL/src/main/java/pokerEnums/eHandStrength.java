@@ -1,5 +1,7 @@
 package pokerEnums;
 
+import java.util.HashMap;
+
 public enum eHandStrength {
 
 	FiveOfAKind(110, "isHandFiveOfAKind") {
@@ -59,6 +61,8 @@ public enum eHandStrength {
 			return "High Card";
 		}
 	};
+	
+	private static HashMap<Integer, String> StrengthStr = null;
 
 	private eHandStrength(final int handstrength, final String EvalMethod) {
 		this.iHandStrength = handstrength;
@@ -74,6 +78,16 @@ public enum eHandStrength {
 
 	public String getEvalMethod() {
 		return this.strEvalMethod;
+	}
+	
+	public static String getStrength(int val) {
+		if (StrengthStr == null) {
+			StrengthStr = new HashMap<Integer, String>();
+			for (eHandStrength ehs : eHandStrength.values()) {
+				StrengthStr.put(ehs.iHandStrength, ehs.toString());
+			}
+		}
+		return StrengthStr.get(val);
 	}
 
 }
