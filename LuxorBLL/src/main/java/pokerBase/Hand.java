@@ -29,8 +29,10 @@ public class Hand implements Serializable {
 
 	@XmlElement(name = "Card")
 	private ArrayList<Card> CardsInHand;
+	
 	@XmlElement
 	private UUID HandID;
+	
 	private ArrayList<Card> BestCardsInHand;
 	
 	private HandScore HandScore;

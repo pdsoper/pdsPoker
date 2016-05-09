@@ -44,11 +44,7 @@
                         <Insets />
                      </opaqueInsets>
                   </HBox>
-                  <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
-                     <children>
-                        <ImageView fitHeight="50.0" fitWidth="320.0" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </HBox>
+                  <HBox fx:id="hBoxPos1" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" />
                   <HBox id="txtPlayer1Name" prefHeight="100.0" prefWidth="200.0">
                      <children>
                         <Label id="txtPos1Name" fx:id="lblPos1Name" />
@@ -99,7 +95,7 @@
                         <Button id="btnPlayer1Fold" mnemonicParsing="false" prefWidth="80.0" text="Raise" />
                      </children>
                   </FlowPane>
-                  <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" />
+                  <HBox fx:id="hBoxPos3" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" />
                   <HBox prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="1">
                      <children>
                         <ToggleButton id="btnPos3SitLeave" fx:id="btnPos3SitLeave" mnemonicParsing="false" onAction="#btnSitLeave_Click" styleClass="togglebutton" stylesheets="@DarkTheme.css" text="Sit" />
@@ -173,11 +169,7 @@
                         <Insets />
                      </opaqueInsets>
                   </HBox>
-                  <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
-                     <children>
-                        <ImageView fitHeight="50.0" fitWidth="320.0" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </HBox>
+                  <HBox fx:id="hBoxPos2" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" />
                   <HBox id="txtPlayer1Name" prefHeight="0.0" prefWidth="114.0">
                      <children>
                         <Label id="txtPos2Name" fx:id="lblPos2Name" />
@@ -230,11 +222,7 @@
                         <Insets />
                      </opaqueInsets>
                   </HBox>
-                  <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
-                     <children>
-                        <ImageView fitHeight="50.0" fitWidth="320.0" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </HBox>
+                  <HBox fx:id="hBoxPos4" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" />
                   <HBox id="txtPlayer1Name" prefHeight="0.0" prefWidth="114.0">
                      <children>
                         <Label id="txtPos4Name" fx:id="lblPos4Name" />

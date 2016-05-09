@@ -3,18 +3,30 @@ package pokerBase;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import javax.xml.bind.annotation.XmlElement;
+
 import pokerEnums.eCardVisibility;
 
 public class GamePlayPlayerHand implements Serializable {
 
+	@XmlElement
 	private GamePlay game = null;
+	
+	@XmlElement
 	private Player player = null;
+	
+	@XmlElement
 	private Hand hand = null;
+	
 	private Hand BestHand = null;
 
+	@XmlElement
 	private boolean folded = false;
+	
+	@XmlElement
 	private HashMap<Card, eCardVisibility> cardVisibility = new HashMap<Card, eCardVisibility>();
 	
+	@XmlElement
 	private Player WinningPlayer = null;
 	
 	public GamePlayPlayerHand(GamePlay gme, Player p) {
@@ -59,6 +71,7 @@ public class GamePlayPlayerHand implements Serializable {
 	public void addCardToHand(Card c, eCardVisibility visibility )
 	{
 		this.hand.AddCardToHand(c);
+		System.out.println(this.hand);
 		this.cardVisibility.put(c, visibility);
 	}
 	

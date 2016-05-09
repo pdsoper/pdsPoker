@@ -15,6 +15,7 @@ import javax.xml.bind.Marshaller;
 
 import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
 
+import exceptions.HandException;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.RotateTransition;
@@ -98,13 +99,30 @@ public class PokerTableController {
 	private Label lblPos3Name;
 	@FXML
 	private Label lblPos4Name;
+	
+	@FXML
+	private HBox hBoxPos1;
+	@FXML
+	private HBox hBoxPos2;
+	@FXML
+	private HBox hBoxPos3;
+	@FXML
+	private HBox hBoxPos4;
+	
 
 	@FXML
 	private void initialize() {
-		imgViewDealerButtonPos3.setVisible(true);
-		imgViewDealerButtonPos4.setVisible(true);
+		imgViewDealerButtonPos1.setImage(new Image("/img/d-button.png"));
+		imgViewDealerButtonPos2.setImage(new Image("/img/d-button.png"));
+		imgViewDealerButtonPos3.setImage(new Image("/img/d-button.png"));
+		imgViewDealerButtonPos4.setImage(new Image("/img/d-button.png"));
+		imgViewDealerButtonPos1.setVisible(false);
+		imgViewDealerButtonPos2.setVisible(false);
+		imgViewDealerButtonPos3.setVisible(false);
+		imgViewDealerButtonPos4.setVisible(false);
 	}
 
+	
 	public void setMainApp(MainApp mainApp) {
 		this.mainApp = mainApp;
 
@@ -238,18 +256,70 @@ public class PokerTableController {
 		}
 	}
 
-	public void Handle_GameState(GamePlay HubGamePlay) 
+	public void Handle_GameState(GamePlay HubGamePlay) throws HandException 
 	{
-		/*
 		imgViewDealerButtonPos1.setVisible(false);
 		imgViewDealerButtonPos2.setVisible(false);
 		imgViewDealerButtonPos3.setVisible(false);
 		imgViewDealerButtonPos4.setVisible(false);
-		*/
+
+		// System.out.println("Running Handle_GameState in PokerTableController");
 
 		//TODO - Lab #5: Check to see if you're the dealer..  If you are, make the imgViewDealerButtonX visible = true
+		switch (HubGamePlay.dealerPosition()) {
+		case 1:
+			imgViewDealerButtonPos1.setVisible(true);
+			break;
+		case 2:
+			imgViewDealerButtonPos2.setVisible(true);
+			break;
+		case 3:
+			imgViewDealerButtonPos3.setVisible(true);
+			break;
+		case 4:
+			imgViewDealerButtonPos4.setVisible(true);
+			break;
+		}
+
+		for (Player p : HubGamePlay.getGamePlayers().values()) {
+			showCards(HubGamePlay, p);
+		}
+	
 		
 	}
+	
+	public void showCards(GamePlay aGamePlay, Player aPlayer) {
+		GamePlayPlayerHand gpph = aGamePlay.playerGPPH(aPlayer);
+		String imgPath = "/img/";
+		String imgExt = ".png";
+		String imgUrl = "";
+		HBox hb = null;
+		switch (aPlayer.getiPlayerPosition()) {
+		case 1:
+			hb = hBoxPos1;
+			break;
+		case 2:
+			hb = hBoxPos2;
+			break;
+		case 3:
+			hb  = hBoxPos3;
+			break;
+		case 4:
+			hb = hBoxPos4;
+			break;
+		}
+		hb.getChildren().clear();
+		ArrayList<Card> cards = gpph.getHand().getCardsInHand(); 
+		System.out.println(cards);
+		for (Card c : cards) {
+			imgUrl = imgPath + c.getiCardNbr() + imgExt;
+			// System.out.println(imgUrl);
+			Image img = new Image(imgUrl);
+			hb.getChildren().add(new ImageView(img));
+		}
+	}
+	
+	
 	@FXML
 	void btnStart_Click(ActionEvent event) {
 		Action act = new Action(eAction.StartGame, mainApp.getPlayer());		

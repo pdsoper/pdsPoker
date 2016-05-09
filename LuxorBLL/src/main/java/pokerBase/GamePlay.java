@@ -9,27 +9,43 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.xml.bind.annotation.XmlElement;
+
 import exceptions.HandException;
 
 public class GamePlay implements Serializable   {
 
 	private UUID GameID;
 	//private UUID PlayerID_NextToAct = null;
+	
+	@XmlElement
 	private HashMap<UUID, Player> hmGamePlayers = new HashMap<UUID, Player>();
+	
+	@XmlElement
 	private ArrayList<GamePlayPlayerHand> GamePlayerHand = new ArrayList<GamePlayPlayerHand>();
+	
+	@XmlElement
 	private ArrayList<GamePlayPlayerHand> GameCommonHand = new ArrayList<GamePlayPlayerHand>();
+	
 	private Rule rle;
+	
 	private Deck GameDeck = null;
+	
+	@XmlElement
 	private UUID GameDealer = null;
+	
 	private int[] iActOrder = null;
 	private Player PlayerNextToAct = null;
 	
-	
 	public GamePlay(Rule rle, UUID GameDealerID)
 	{
-		this.setGameID(UUID.randomUUID());
-		this.setGameDealer(GameDealer);
+		this.GameID = UUID.randomUUID();
+		this.GameDealer = GameDealerID;
 		this.rle = rle;
+	}
+	
+	public int dealerPosition() {
+		return hmGamePlayers.get(GameDealer).getiPlayerPosition();
 	}
 	
 	public void initializeHands() {
@@ -84,8 +100,8 @@ public class GamePlay implements Serializable   {
 		return GameDealer;
 	}
 
-	private void setGameDealer(UUID gameDealer) {
-		GameDealer = gameDealer;
+	private void setGameDealer(UUID gameDealerID) {
+		GameDealer = gameDealerID;
 	}
 
 	public void addGamePlayPlayerHand(GamePlayPlayerHand GPPH)
