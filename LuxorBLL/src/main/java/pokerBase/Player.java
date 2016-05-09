@@ -60,6 +60,10 @@ public class Player implements Serializable {
 	public int getiPokerClientID() {
 		return iPokerClientID;
 	}
+	
+	public boolean equals(Player p) {
+		return this.PlayerID.equals(p.getPlayerID());
+	}
 
 	public String toString() {
 		return "Player " + this.PlayerName + " = client " + this.iPokerClientID 

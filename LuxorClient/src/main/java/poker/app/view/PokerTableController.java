@@ -293,7 +293,10 @@ public class PokerTableController {
 		String imgPath = "/img/";
 		String imgExt = ".png";
 		String imgUrl = "";
+		Image img = null;
+		Image cardBack = new Image("/img/card_back.png");
 		HBox hb = null;
+		Player myself = this.mainApp.getPlayer();
 		switch (aPlayer.getiPlayerPosition()) {
 		case 1:
 			hb = hBoxPos1;
@@ -310,11 +313,13 @@ public class PokerTableController {
 		}
 		hb.getChildren().clear();
 		ArrayList<Card> cards = gpph.getHand().getCardsInHand(); 
-		System.out.println(cards);
 		for (Card c : cards) {
-			imgUrl = imgPath + c.getiCardNbr() + imgExt;
-			// System.out.println(imgUrl);
-			Image img = new Image(imgUrl);
+			if (gpph.playerCardVisible(myself, c)) {
+				imgUrl = imgPath + c.getiCardNbr() + imgExt;
+				img = new Image(imgUrl);
+			} else {
+				img = cardBack;
+			}
 			hb.getChildren().add(new ImageView(img));
 		}
 	}

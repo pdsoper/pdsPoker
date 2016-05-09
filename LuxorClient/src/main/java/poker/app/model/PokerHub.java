@@ -38,6 +38,7 @@ public class PokerHub extends Hub {
 
 	public PokerHub(int port) throws IOException {
 		super(port);
+		this.setAutoreset(true);
 	}
 
 	// Modified for extra credit

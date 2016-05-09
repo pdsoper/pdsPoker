@@ -71,13 +71,13 @@ public class GamePlayPlayerHand implements Serializable {
 	public void addCardToHand(Card c, eCardVisibility visibility )
 	{
 		this.hand.AddCardToHand(c);
-		System.out.println(this.hand);
 		this.cardVisibility.put(c, visibility);
 	}
 	
 	public boolean playerCardVisible(Player p, Card c) {
-		return this.player.equals(p) || 
-			this.cardVisibility.get(c) == eCardVisibility.VisibleEveryone;
+		return this.player.equals(p)
+			|| this.WinningPlayer != null
+			|| this.cardVisibility.get(c) == eCardVisibility.VisibleEveryone;
 	}
 	
 	public Player getWinningPlayer() {
