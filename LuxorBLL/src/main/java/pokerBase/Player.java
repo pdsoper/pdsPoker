@@ -62,7 +62,8 @@ public class Player implements Serializable {
 	}
 
 	public String toString() {
-		return "Client " + this.iPokerClientID + ", position " + this.iPlayerPosition+ ", name = " + this.PlayerName; 
+		return "Player " + this.PlayerName + " = client " + this.iPokerClientID 
+				+ " in position " + this.iPlayerPosition;
 	}
 
 }

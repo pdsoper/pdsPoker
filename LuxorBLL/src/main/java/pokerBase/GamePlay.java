@@ -186,7 +186,7 @@ public class GamePlay implements Serializable   {
 		boolean firstTime = true;
 		GamePlayPlayerHand winner = null;
 		for (GamePlayPlayerHand gpph : this.GamePlayerHand) {
-			Hand.Evaluate(gpph.getHand());
+			gpph.setHand(Hand.Evaluate(gpph.getHand()));
 			if (firstTime) {
 				winner = gpph;
 				firstTime = false;

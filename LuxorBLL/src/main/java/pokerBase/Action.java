@@ -18,6 +18,9 @@ public class Action implements Serializable {
 	@XmlElement
 	private Player ActPlayer;
 	
+	@XmlElement
+	private String tableText;
+	
 	private eGame eGame;
 	
 	public Action()
@@ -28,9 +31,16 @@ public class Action implements Serializable {
 		super();
 		this.eAction = eAction;
 		this.ActPlayer = player;
+		this.tableText = "";
 	}
 
-
+	public String getTableText() {
+		return tableText;
+	}
+	
+	public void setTableText(String tableText) {
+		this.tableText = tableText;
+	}
 	public eAction getAction() {
 		return eAction;
 	}

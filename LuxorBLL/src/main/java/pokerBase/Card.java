@@ -75,6 +75,10 @@ public class Card implements Comparable,  Serializable {
 	}
 	
 	public String toString() {
-		return this.eRank.toString() + this.eSuit.toString();
+		String ans = this.eRank.toString() + this.eSuit.toString();
+		if (this.isWild()) {
+			ans += " (wild)";
+		}
+		return ans;
 	}
 }

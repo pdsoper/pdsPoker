@@ -120,6 +120,10 @@ public class PokerTableController {
 					+ "   ClientID: " + p.getiPokerClientID() + '\n');
 		}
 	}
+	
+	public void appendText(String txt) {
+		txtPlayerArea.appendText(txt);
+	}
 
 	@FXML
 	private void handlePlay() {

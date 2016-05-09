@@ -32,7 +32,7 @@ public class Hand implements Serializable {
 	@XmlElement
 	private UUID HandID;
 	private ArrayList<Card> BestCardsInHand;
-
+	
 	private HandScore HandScore;
 	private boolean bScored = false;
 
@@ -135,6 +135,10 @@ public class Hand implements Serializable {
 		{
 			throw new HandException(h,eHandExceptionType.ShortHand);			
 		}
+		/* XXX It was critical to add this line, since the two special cases
+		 * assume the cards in the hand are sorted.
+		 */
+		Collections.sort(h.getCardsInHand());
 		
 		//	If the fifth card is a Joker or Wild, all five cards are jokers.  Short circuit- return 5 aces
 		if ((h.getCardsInHand().get(eCardNo.FifthCard.getCardNo()).isWild()) ||
@@ -142,6 +146,10 @@ public class Hand implements Serializable {
 				{
 			Hand hnd = new Hand();
 			hnd.setCardsInHand(h.getCardsInHand());
+			Card ace = new Card(eSuit.HEARTS, eRank.ACE, 13);
+			for (int i = 0; i < 5; i++) {
+				hnd.BestCardsInHand.add(ace);
+			}
 			HandScore hs = new HandScore();
 			hs.setHandStrength(eHandStrength.FiveOfAKind.ordinal());
 			hs.setHiHand(eRank.ACE.ordinal());
@@ -156,6 +164,9 @@ public class Hand implements Serializable {
 				{
 			Hand hnd = new Hand();
 			hnd.setCardsInHand(h.getCardsInHand());
+			for (int i = 0; i < 5; i++) {
+				hnd.BestCardsInHand.add(h.getCardsInHand().get(eCardNo.FifthCard.getCardNo()));
+			}
 			HandScore hs = new HandScore();
 			hs.setHandStrength(eHandStrength.FiveOfAKind.ordinal());
 			hs.setHiHand(h.getCardsInHand().get(eCardNo.FifthCard.getCardNo()).geteRank().getiRankNbr());
@@ -177,7 +188,11 @@ public class Hand implements Serializable {
 		Collections.sort(AllHands,Hand.HandRank);
 		
 		//	This will pick the best hand (highest sort) and return it
-		return AllHands.get(0);
+		Hand hnd = AllHands.get(0);
+		for (int i = 0; i < 5; i++) {
+			hnd.BestCardsInHand.add(h.getCardsInHand().get(i));
+		}
+		return hnd;
 		
 	}
 	
@@ -687,11 +702,29 @@ public class Hand implements Serializable {
 	
 	public String toString() {
 		String ans = "";
+		if (this.BestCardsInHand.size() > 0) {
+			ans += "Original cards in hand: ";
+			for (Card c : this.BestCardsInHand) {
+				ans += c.toString() + " ";
+			}
+			ans += "\n";
+		}
+		ans += "Cards in hand: ";
 		for (Card c : this.CardsInHand) {
 			ans += c.toString() + " ";
 		}
 		if (this.bScored) {
-			ans += " " + eHandStrength.getStrength(this.HandScore.getHandStrength());
+			ans += "\n" + eHandStrength.getStrength(this.HandScore.getHandStrength());
+			ans += ", HiHand = " + eRank.getRank(this.HandScore.getHiHand());
+			if (this.HandScore.getLoHand() > 0) {
+				ans += ", LoHand = " + eRank.getRank(this.HandScore.getLoHand());
+			}
+			if (this.HandScore.getKickers().size() > 0) {
+				ans += ", Kickers = ";
+				for (Card c : this.HandScore.getKickers()) {
+					ans +=  c.toString() + " ";
+				}
+			}
 		}
 		return ans;
 	}

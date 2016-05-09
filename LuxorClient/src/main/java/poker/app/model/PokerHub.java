@@ -88,9 +88,6 @@ public class PokerHub extends Hub {
 				// System.out.println("Starting Game!");
 				resetOutput();
 
-				// TODO - Lab #5 Do all the things you need to do to start a
-				// game!!
-
 				// Determine which game is selected (from RootTableController)
 				// 1 line of code
 
@@ -156,7 +153,7 @@ public class PokerHub extends Hub {
 				// Deal out the first round
 				this.currentDraw = eDrawCount.FIRST;
 				System.out.println(this.currentDraw + " draw");
-				DealCards();
+				DealCards(act);
 
 				// Send the state of the game back to the players
 
@@ -166,9 +163,10 @@ public class PokerHub extends Hub {
 				this.currentDraw = this.currentDraw.next();
 				if (HubGamePlay.getRule().hasDrawCount(this.currentDraw)) {
 					System.out.println(this.currentDraw + " draw");
-					DealCards();
+					act.setTableText(this.currentDraw.toString() + " draw");
+					DealCards(act);
 				} else {
-					this.ScoreHands();
+					this.ScoreHands(act);
 				}
 				sendToAll(HubGamePlay);
 				break;
@@ -182,18 +180,18 @@ public class PokerHub extends Hub {
 		// System.out.println("Message Received by Hub");
 	}
 
-	private void ScoreHands() {
+	private void ScoreHands(Action act) {
 		Player winner = null;
 		try {
 			winner = HubGamePlay.findWinner();
 			System.out.println(winner.getPlayerName() + " is the winner");
+			act.setTableText(winner.getPlayerName() + " is the winner");
 		} catch (HandException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	private void DealCards() {
+	private void DealCards(Action act) {
 		CardDraw cd = HubGamePlay.getRule().getCardDraw(this.currentDraw);
 		Deck dk = HubGamePlay.getGameDeck();
 		
