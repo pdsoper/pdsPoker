@@ -230,9 +230,42 @@ public class GamePlay implements Serializable   {
 	}
 	
 	public String toString() {
-		String ans = "";
+		String ans = "\n";
 		for (GamePlayPlayerHand gpph : GamePlayerHand) {
 			ans += gpph.toString() + "\n";
+		}
+		return ans;
+	}
+	
+	public Player winner() {
+		if (this.GamePlayerHand.size() > 0) {
+			return this.GamePlayerHand.get(0).getWinningPlayer();
+		} else {
+			return null;
+		}
+	}
+	
+	public String scoreReport() {
+		Player winner = this.winner();
+		if (winner == null) {
+			return "";
+		}
+		String ans = "";
+		GamePlayPlayerHand gpphw = null;
+		ans += "\n" + winner.getPlayerName() + " wins!\n";
+		gpphw = this.playerGPPH(winner);
+		ans += gpphw.getHand().getHandScore().toString();
+		for (GamePlayPlayerHand gpph : this.GamePlayerHand) {
+			Player aPlayer = gpph.getPlayer();
+			if (aPlayer.equals(winner)) {
+				continue;
+			}
+			ans += "\n" + aPlayer.getPlayerName() + " : ";
+			if (gpph.isFolded()) {
+				ans+= "folded";
+			} else {
+				ans += gpph.getHand().getHandScore();
+			}
 		}
 		return ans;
 	}

@@ -281,11 +281,13 @@ public class PokerTableController {
 			break;
 		}
 
-		for (Player p : HubGamePlay.getGamePlayers().values()) {
-			showCards(HubGamePlay, p);
+		if (HubGamePlay.winner() != null) {
+			this.txtPlayerArea.appendText(HubGamePlay.scoreReport());
 		}
-	
-		
+		for (Player aPlayer : HubGamePlay.getGamePlayers().values()) {
+			showCards(HubGamePlay, aPlayer);
+		}
+
 	}
 	
 	public void showCards(GamePlay aGamePlay, Player aPlayer) {

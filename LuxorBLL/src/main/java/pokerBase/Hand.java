@@ -715,19 +715,11 @@ public class Hand implements Serializable {
 		for (Card c : this.CardsInHand) {
 			ans += c.toString() + " ";
 		}
+		/*
 		if (this.bScored) {
-			ans += "\n" + eHandStrength.getStrength(this.HandScore.getHandStrength());
-			ans += ", HiHand = " + eRank.getRank(this.HandScore.getHiHand());
-			if (this.HandScore.getLoHand() > 0) {
-				ans += ", LoHand = " + eRank.getRank(this.HandScore.getLoHand());
-			}
-			if (this.HandScore.getKickers().size() > 0) {
-				ans += ", Kickers = ";
-				for (Card c : this.HandScore.getKickers()) {
-					ans +=  c.toString() + " ";
-				}
-			}
+			ans += "\n" + this.HandScore.getHandStrength();
 		}
+		*/
 		return ans;
 	}
 

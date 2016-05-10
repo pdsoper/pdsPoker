@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.io.Serializable;
 import javax.xml.bind.annotation.XmlElement;
 
+import pokerEnums.eHandStrength;
+import pokerEnums.eRank;
+
 public class HandScore implements Serializable {
 
 
@@ -63,5 +66,18 @@ public class HandScore implements Serializable {
 		Natural = natural;
 	}
 	
-	
+	public String toString() {
+		String ans = eHandStrength.getStrength(this.getHandStrength());
+		ans += ", HiHand = " + eRank.getRank(this.getHiHand());
+		if (this.getLoHand() > 0) {
+			ans += ", LoHand = " + eRank.getRank(this.getLoHand());
+		}
+		if (this.getKickers().size() > 0) {
+			ans += ", Kickers = ";
+			for (Card c : this.getKickers()) {
+				ans +=  c.toString() + " ";
+			}
+		}
+		return ans;
+	}
 }

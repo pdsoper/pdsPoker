@@ -154,7 +154,7 @@ public class PokerHub extends Hub {
 				// Deal out the first round
 				this.currentDraw = eDrawCount.FIRST;
 				System.out.println(this.currentDraw + " draw");
-				DealCards(act);
+				DealCards();
 
 				// Send the state of the game back to the players
 
@@ -164,10 +164,9 @@ public class PokerHub extends Hub {
 				this.currentDraw = this.currentDraw.next();
 				if (HubGamePlay.getRule().hasDrawCount(this.currentDraw)) {
 					System.out.println(this.currentDraw + " draw");
-					act.setTableText(this.currentDraw.toString() + " draw");
-					DealCards(act);
+					DealCards();
 				} else {
-					this.ScoreHands(act);
+					this.ScoreHands();
 				}
 				sendToAll(HubGamePlay);
 				break;
@@ -181,18 +180,16 @@ public class PokerHub extends Hub {
 		// System.out.println("Message Received by Hub");
 	}
 
-	private void ScoreHands(Action act) {
-		Player winner = null;
+	private void ScoreHands() {
 		try {
-			winner = HubGamePlay.findWinner();
-			System.out.println(winner.getPlayerName() + " is the winner");
-			act.setTableText(winner.getPlayerName() + " is the winner");
+			HubGamePlay.findWinner();
+			System.out.println(HubGamePlay.scoreReport());
 		} catch (HandException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private void DealCards(Action act) {
+	private void DealCards() {
 		CardDraw cd = HubGamePlay.getRule().getCardDraw(this.currentDraw);
 		Deck dk = HubGamePlay.getGameDeck();
 		

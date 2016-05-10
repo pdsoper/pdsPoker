@@ -77,8 +77,6 @@ public class RootLayoutController implements Initializable {
 	
 	public void BuildMenus()
 	{
-
-		
 		
 		Menu mnuGame = new Menu();
 		mnuGame.setText("Pick Game");
