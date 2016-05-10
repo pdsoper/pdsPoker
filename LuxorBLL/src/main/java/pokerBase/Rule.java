@@ -51,7 +51,7 @@ public class Rule implements Serializable {
 			case FiveStudOneJoker: {
 				this.MaxNumberOfPlayers = 4;
 				this.PlayerNumberOfCards = 5;
-				this.NumberOfJokers = 1;
+				this.NumberOfJokers = 21;
 				this.PlayerCardsMin = 5;
 				this.PlayerCardsMax = 5;			
 				this.CommunityCardsMin = 0;

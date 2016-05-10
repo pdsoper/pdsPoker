@@ -42,6 +42,7 @@ public class PokerHub extends Hub {
 	}
 
 	// Modified for extra credit
+	// nPlayerConnections() was added to Hub.java
 	protected void playerConnected(int playerID) {
 		if (HubGamePlay != null && this.nPlayerConnections() == HubGamePlay.getRule().GetMaxNumberOfPlayers()) {
 			shutdownServerSocket();
