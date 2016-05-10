@@ -43,6 +43,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
@@ -67,6 +68,9 @@ public class PokerTableController {
 
 	public PokerTableController() {
 	}
+	
+	@FXML 
+	private Button btnDeal;
 	
 	@FXML private ImageView imgViewDealerButtonPos1;
 	@FXML private ImageView imgViewDealerButtonPos2;
@@ -109,6 +113,14 @@ public class PokerTableController {
 	@FXML
 	private HBox hBoxPos4;
 	
+	@FXML
+	private FlowPane btnFlowPanePos1;
+	@FXML
+	private FlowPane btnFlowPanePos2;
+	@FXML
+	private FlowPane btnFlowPanePos3;
+	@FXML
+	private FlowPane btnFlowPanePos4;
 
 	@FXML
 	private void initialize() {
@@ -280,6 +292,15 @@ public class PokerTableController {
 			imgViewDealerButtonPos4.setVisible(true);
 			break;
 		}
+		
+		/*if (HubGamePlay.isGameInProgress()){
+			btnStartGame.setVisible(false);
+			btnDeal.setVisible(true);	
+		}
+		else {
+			btnStartGame.setVisible(true);
+			btnDeal.setVisible(false);
+		}*/
 
 		this.txtPlayerArea.setText(HubGamePlay.scoreReport());
 		if (HubGamePlay.winner() != null){
@@ -293,13 +314,18 @@ public class PokerTableController {
 	
 	public void showCards(GamePlay aGamePlay, Player aPlayer) {
 		GamePlayPlayerHand gpph = aGamePlay.playerGPPH(aPlayer);
+		double ivSize = 50.0;
 		String imgPath = "/img/";
 		String imgExt = ".png";
 		String imgUrl = "";
 		Image img = null;
 		Image cardBack = new Image("/img/card_back.png");
+		ImageView cbiv = new ImageView(cardBack);
+		cbiv.setFitHeight(ivSize);
+		cbiv.setPreserveRatio(true);
 		HBox hb = null;
 		Player myself = this.mainApp.getPlayer();
+		//btnFlowPanePos1.setVisible(false);
 		switch (aPlayer.getiPlayerPosition()) {
 		case 1:
 			hb = hBoxPos1;
@@ -313,6 +339,7 @@ public class PokerTableController {
 		case 4:
 			hb = hBoxPos4;
 			break;
+			
 		}
 		hb.getChildren().clear();
 		ArrayList<Card> cards = null;
@@ -328,8 +355,16 @@ public class PokerTableController {
 			} else {
 				img = cardBack;
 			}
-			hb.getChildren().add(new ImageView(img));
+			ImageView iv = new ImageView(img); 
+			iv.setFitHeight(ivSize);
+			iv.setPreserveRatio(true);
+			hb.getChildren().add(iv);
+			
 		}
+	}
+	
+	public void showButtons(GamePlay aGamePlay, Player aPlayer) {
+		
 	}
 	
 	
@@ -347,6 +382,13 @@ public class PokerTableController {
 	void btnDeal_Click(ActionEvent event) {
 		Action act = new Action(eAction.Deal, mainApp.getPlayer());
 		mainApp.messageSend(act);
+	}
+	
+	@FXML
+	void btnDraw_Click(ActionEvent event) {
+		Action act = new Action(eAction.Draw, mainApp.getPlayer());
+		mainApp.messageSend(act);
+		
 	}
 
 	@FXML
