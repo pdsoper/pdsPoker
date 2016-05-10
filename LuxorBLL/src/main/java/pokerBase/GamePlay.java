@@ -24,6 +24,17 @@ public class GamePlay implements Serializable   {
 	@XmlElement
 	private ArrayList<GamePlayPlayerHand> GamePlayerHand = new ArrayList<GamePlayPlayerHand>();
 	
+	public boolean isGameInProgress(){
+		if (GamePlayerHand.size() == 0){
+			return false;
+		}
+		if (this.winner() != null){
+			return false;
+		}
+		GamePlayPlayerHand gpph = GamePlayerHand.get(0);
+		return gpph.getHand().getCardsInHand().size() > 0;	
+	}
+	
 	@XmlElement
 	private ArrayList<GamePlayPlayerHand> GameCommonHand = new ArrayList<GamePlayPlayerHand>();
 	
