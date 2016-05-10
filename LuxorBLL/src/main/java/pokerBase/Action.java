@@ -30,7 +30,6 @@ public class Action implements Serializable {
 		this.ActPlayer = player;
 	}
 
-
 	public eAction getAction() {
 		return eAction;
 	}

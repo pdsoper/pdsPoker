@@ -19,17 +19,22 @@ import exceptions.HandException;
 import pokerEnums.*;
 
 import static java.lang.System.out;
+
+import java.io.Serializable;
+
 import static java.lang.System.err;
 
 @XmlRootElement
-public class Hand  {
+public class Hand implements Serializable {
 
 	@XmlElement(name = "Card")
 	private ArrayList<Card> CardsInHand;
+	
 	@XmlElement
 	private UUID HandID;
+	
 	private ArrayList<Card> BestCardsInHand;
-
+	
 	private HandScore HandScore;
 	private boolean bScored = false;
 
@@ -132,6 +137,10 @@ public class Hand  {
 		{
 			throw new HandException(h,eHandExceptionType.ShortHand);			
 		}
+		/* XXX It was critical to add this line, since the two special cases
+		 * assume the cards in the hand are sorted.
+		 */
+		Collections.sort(h.getCardsInHand());
 		
 		//	If the fifth card is a Joker or Wild, all five cards are jokers.  Short circuit- return 5 aces
 		if ((h.getCardsInHand().get(eCardNo.FifthCard.getCardNo()).isWild()) ||
@@ -139,6 +148,10 @@ public class Hand  {
 				{
 			Hand hnd = new Hand();
 			hnd.setCardsInHand(h.getCardsInHand());
+			Card ace = new Card(eSuit.HEARTS, eRank.ACE, 13);
+			for (int i = 0; i < 5; i++) {
+				hnd.BestCardsInHand.add(ace);
+			}
 			HandScore hs = new HandScore();
 			hs.setHandStrength(eHandStrength.FiveOfAKind.ordinal());
 			hs.setHiHand(eRank.ACE.ordinal());
@@ -153,6 +166,9 @@ public class Hand  {
 				{
 			Hand hnd = new Hand();
 			hnd.setCardsInHand(h.getCardsInHand());
+			for (int i = 0; i < 5; i++) {
+				hnd.BestCardsInHand.add(h.getCardsInHand().get(eCardNo.FifthCard.getCardNo()));
+			}
 			HandScore hs = new HandScore();
 			hs.setHandStrength(eHandStrength.FiveOfAKind.ordinal());
 			hs.setHiHand(h.getCardsInHand().get(eCardNo.FifthCard.getCardNo()).geteRank().getiRankNbr());
@@ -174,7 +190,11 @@ public class Hand  {
 		Collections.sort(AllHands,Hand.HandRank);
 		
 		//	This will pick the best hand (highest sort) and return it
-		return AllHands.get(0);
+		Hand hnd = AllHands.get(0);
+		for (int i = 0; i < 5; i++) {
+			hnd.BestCardsInHand.add(h.getCardsInHand().get(i));
+		}
+		return hnd;
 		
 	}
 	
@@ -185,7 +205,7 @@ public class Hand  {
 	 * @return
 	 * @throws HandException
 	 */
-	private static Hand EvaluateHand(Hand h) throws HandException {
+	public static Hand EvaluateHand(Hand h) throws HandException {
 
 		Collections.sort(h.getCardsInHand());
 
@@ -681,5 +701,26 @@ public class Hand  {
 			return 0;
 		}
 	};
+	
+	public String toString() {
+		String ans = "";
+		if (this.BestCardsInHand.size() > 0) {
+			ans += "Original cards in hand: ";
+			for (Card c : this.BestCardsInHand) {
+				ans += c.toString() + " ";
+			}
+			ans += "\n";
+		}
+		ans += "Cards in hand: ";
+		for (Card c : this.CardsInHand) {
+			ans += c.toString() + " ";
+		}
+		/*
+		if (this.bScored) {
+			ans += "\n" + this.HandScore.getHandStrength();
+		}
+		*/
+		return ans;
+	}
 
 }

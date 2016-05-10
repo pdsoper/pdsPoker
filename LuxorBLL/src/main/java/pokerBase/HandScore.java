@@ -1,10 +1,13 @@
 package pokerBase;
 
 import java.util.ArrayList;
-
+import java.io.Serializable;
 import javax.xml.bind.annotation.XmlElement;
 
-public class HandScore {
+import pokerEnums.eHandStrength;
+import pokerEnums.eRank;
+
+public class HandScore implements Serializable {
 
 
 	private int HandStrength;
@@ -63,5 +66,18 @@ public class HandScore {
 		Natural = natural;
 	}
 	
-	
+	public String toString() {
+		String ans = eHandStrength.getStrength(this.getHandStrength());
+		ans += ", HiHand = " + eRank.getRank(this.getHiHand());
+		if (this.getLoHand() > 0) {
+			ans += ", LoHand = " + eRank.getRank(this.getLoHand());
+		}
+		if (this.getKickers().size() > 0) {
+			ans += ", kickers = ";
+			for (Card c : this.getKickers()) {
+				ans +=  c.toString() + " ";
+			}
+		}
+		return ans;
+	}
 }

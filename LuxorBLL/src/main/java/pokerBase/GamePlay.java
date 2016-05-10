@@ -2,33 +2,62 @@ package pokerBase;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.xml.bind.annotation.XmlElement;
+
+import exceptions.HandException;
+
 public class GamePlay implements Serializable   {
 
 	private UUID GameID;
 	//private UUID PlayerID_NextToAct = null;
+	
+	@XmlElement
 	private HashMap<UUID, Player> hmGamePlayers = new HashMap<UUID, Player>();
+	
+	@XmlElement
 	private ArrayList<GamePlayPlayerHand> GamePlayerHand = new ArrayList<GamePlayPlayerHand>();
+	
+	@XmlElement
 	private ArrayList<GamePlayPlayerHand> GameCommonHand = new ArrayList<GamePlayPlayerHand>();
+	
 	private Rule rle;
+	
 	private Deck GameDeck = null;
+	
+	@XmlElement
 	private UUID GameDealer = null;
+	
 	private int[] iActOrder = null;
 	private Player PlayerNextToAct = null;
 	
 	
 	public GamePlay(Rule rle, UUID GameDealerID)
 	{
-		this.setGameID(UUID.randomUUID());
-		this.setGameDealer(GameDealer);
+		this.GameID = UUID.randomUUID();
+		this.GameDealer = GameDealerID;
 		this.rle = rle;
 	}
-
+	
+	public int dealerPosition() {
+		return hmGamePlayers.get(GameDealer).getiPlayerPosition();
+	}
+	
+	public void initializeHands() {
+		this.GamePlayerHand.clear();
+		for (Player p : this.hmGamePlayers.values()) {
+			GamePlayPlayerHand gpph = new GamePlayPlayerHand(this, p);
+			this.GamePlayerHand.add(gpph);
+		}
+		this.GameCommonHand.clear();
+	}
+	
 	public UUID getGameID() {
 		return GameID;
 	}
@@ -54,6 +83,7 @@ public class GamePlay implements Serializable   {
 	{
 		this.hmGamePlayers.put(p.getPlayerID(),p);
 	}
+	
 	public Player getGamePlayer(UUID PlayerID)
 	{
 		return (Player) this.hmGamePlayers.get(PlayerID);
@@ -71,8 +101,8 @@ public class GamePlay implements Serializable   {
 		return GameDealer;
 	}
 
-	private void setGameDealer(UUID gameDealer) {
-		GameDealer = gameDealer;
+	private void setGameDealer(UUID gameDealerID) {
+		GameDealer = gameDealerID;
 	}
 
 	public void addGamePlayPlayerHand(GamePlayPlayerHand GPPH)
@@ -92,7 +122,6 @@ public class GamePlay implements Serializable   {
 	public void setiActOrder(int[] iActOrder) {
 		this.iActOrder = iActOrder;
 	}
-
 	
 	public Player getPlayerNextToAct() {
 		return PlayerNextToAct;
@@ -170,20 +199,101 @@ public class GamePlay implements Serializable   {
 	}
 	*/
 	
-/*	public GamePlayPlayerHand FindPlayerGame(GamePlay gme, Player p)
-	{
-		GamePlayPlayerHand GPPHReturn = null;
-		
+	public Player findWinner() throws HandException {
+		boolean firstTime = true;
+		GamePlayPlayerHand winner = null;
+		for (GamePlayPlayerHand gpph : this.GamePlayerHand) {
+			gpph.setHand(Hand.Evaluate(gpph.getHand()));
+			if (firstTime) {
+				winner = gpph;
+				firstTime = false;
+			} else if (Hand.HandRank.compare(winner.getHand(), gpph.getHand()) > 0) {
+				winner = gpph;
+			}
+		}
+		if (winner != null) {
+			for (GamePlayPlayerHand gpph : this.GamePlayerHand) {
+				gpph.setWinningPlayer(winner.getPlayer());
+			}
+		}
+		return winner.getPlayer();
+	}
 	
-		for (GamePlayPlayerHand GPPH: GamePlayerHand)
-		{
-			if (p.getiPlayerPosition() == GPPH.getPlayer().getiPlayerPosition())
-			{
+	public GamePlayPlayerHand playerGPPH(Player aPlayer) {
+		GamePlayPlayerHand GPPHReturn = null;
+		for (GamePlayPlayerHand GPPH : GamePlayerHand) {
+			if (aPlayer.equals(GPPH.getPlayer())) {
 				GPPHReturn = GPPH;
+				break;
 			}
 		}
 		return GPPHReturn;
-	}*/
+	}
 	
+	public String toString() {
+		String ans = "\n";
+		for (GamePlayPlayerHand gpph : GamePlayerHand) {
+			ans += gpph.toString() + "\n";
+		}
+		return ans;
+	}
+	
+	public Player winner() {
+		if (this.GamePlayerHand.size() > 0) {
+			return this.GamePlayerHand.get(0).getWinningPlayer();
+		} else {
+			return null;
+		}
+	}
+	
+	public int nPlayers() {
+		return this.hmGamePlayers.size();
+	}
+	
+	public Player nextDealer() {
+		if (this.GameDealer == null || this.rle == null) return null;
+		Player currentDealer = this.hmGamePlayers.get(this.GameDealer);
+		int currentDealerPos = currentDealer.getiPlayerPosition();
+		int maxPlayers = this.rle.GetMaxNumberOfPlayers();
+		Player nextDealer = null;
+		int np  = this.nPlayers();
+		for (int i = 1 ; i < maxPlayers; i++) {
+			int nextDealerPos = currentDealerPos + i;
+			if (nextDealerPos > maxPlayers) {
+				nextDealerPos = nextDealerPos - maxPlayers;
+			}
+			System.out.println("current = " + currentDealerPos + ", next = " + nextDealerPos);
+			nextDealer = this.getPlayerByPosition(nextDealerPos);
+			if (nextDealer != null) {
+				break;
+			}
+		}
+		return nextDealer;
+	}
+	
+	public String scoreReport() {
+		Player winner = this.winner();
+		if (winner == null) {
+			return "";
+		}
+		String ans = "";
+		GamePlayPlayerHand gpphw = null;
+		ans += winner.getPlayerName() + " wins!\n";
+		gpphw = this.playerGPPH(winner);
+		ans += gpphw.getHand().getHandScore().toString();
+		for (GamePlayPlayerHand gpph : this.GamePlayerHand) {
+			Player aPlayer = gpph.getPlayer();
+			if (aPlayer.equals(winner)) {
+				continue;
+			}
+			ans += "\n" + aPlayer.getPlayerName() + " : ";
+			if (gpph.isFolded()) {
+				ans+= "folded";
+			} else {
+				ans += gpph.getHand().getHandScore();
+			}
+		}
+		return ans;
+	}
 	
 }

@@ -56,7 +56,6 @@ public class Card implements Comparable,  Serializable {
 		Wild = wild;
 	}
 
-
 	public static Comparator<Card> CardRank = new Comparator<Card>() {
 
 		public int compare(Card c1, Card c2) {
@@ -73,5 +72,13 @@ public class Card implements Comparable,  Serializable {
 	    Card c = (Card) o; 
 	    return c.geteRank().compareTo(this.geteRank()); 
 
+	}
+	
+	public String toString() {
+		String ans = this.eRank.toString() + this.eSuit.toString();
+		if (this.isWild()) {
+			ans += " (wild)";
+		}
+		return ans;
 	}
 }

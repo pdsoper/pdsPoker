@@ -262,7 +262,12 @@ public class MainApp extends Application {
 				}
 				else if (message instanceof GamePlay)
 				{
-					pokerController.Handle_GameState((GamePlay)message);
+					try {
+						pokerController.Handle_GameState((GamePlay)message);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 			
 					//	The game changed...  poker table should react to the new state of game
 				}
