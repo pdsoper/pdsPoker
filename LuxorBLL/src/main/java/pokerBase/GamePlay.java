@@ -25,14 +25,10 @@ public class GamePlay implements Serializable   {
 	private ArrayList<GamePlayPlayerHand> GamePlayerHand = new ArrayList<GamePlayPlayerHand>();
 	
 	public boolean isGameInProgress(){
-		if (GamePlayerHand.size() == 0){
+		if (GamePlayerHand.size() == 0 || this.winner() != null) {
 			return false;
 		}
-		if (this.winner() != null){
-			return false;
-		}
-		GamePlayPlayerHand gpph = GamePlayerHand.get(0);
-		return gpph.getHand().getCardsInHand().size() > 0;	
+		return GamePlayerHand.get(0).getHand().getCardsInHand().size() > 0;	
 	}
 	
 	@XmlElement

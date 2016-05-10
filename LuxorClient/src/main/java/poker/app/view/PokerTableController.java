@@ -69,9 +69,6 @@ public class PokerTableController {
 	public PokerTableController() {
 	}
 	
-	@FXML 
-	private Button btnDeal;
-	
 	@FXML private ImageView imgViewDealerButtonPos1;
 	@FXML private ImageView imgViewDealerButtonPos2;
 	@FXML private ImageView imgViewDealerButtonPos3;
@@ -84,8 +81,11 @@ public class PokerTableController {
 	@FXML
 	private TextArea txtPlayerArea;
 
+	@FXML 
+	private Button btnDeal;	
 	@FXML
 	private Button btnStartGame;
+	
 	@FXML
 	private ToggleButton btnPos1SitLeave;
 	@FXML
@@ -151,10 +151,6 @@ public class PokerTableController {
 		}
 	}
 	
-	public void appendText(String txt) {
-		txtPlayerArea.appendText(txt);
-	}
-
 	@FXML
 	private void handlePlay() {
 	}
@@ -199,6 +195,12 @@ public class PokerTableController {
 		lblPos2Name.setText("");
 		lblPos3Name.setText("");
 		lblPos4Name.setText("");
+		
+		// Failed attempt to change color for labels that hold player names
+		lblPos1Name.setStyle("color:white");
+		lblPos2Name.setStyle("color:white");
+		lblPos3Name.setStyle("color:white");
+		lblPos4Name.setStyle("color:white");
 
 		//scanInputControls(OuterBorderPane, "SitLeave",true);
 		
@@ -293,14 +295,7 @@ public class PokerTableController {
 			break;
 		}
 		
-		/*if (HubGamePlay.isGameInProgress()){
-			btnStartGame.setVisible(false);
-			btnDeal.setVisible(true);	
-		}
-		else {
-			btnStartGame.setVisible(true);
-			btnDeal.setVisible(false);
-		}*/
+		// this.showButtons(HubGamePlay);
 
 		this.txtPlayerArea.setText(HubGamePlay.scoreReport());
 		if (HubGamePlay.winner() != null){
@@ -310,6 +305,35 @@ public class PokerTableController {
 			showCards(HubGamePlay, aPlayer);
 		}
 
+	}
+	
+	public void showButtons(GamePlay aGamePlay) {
+		int myPos = this.mainApp.getPlayer().getiPlayerPosition();
+		btnFlowPanePos1.setVisible(false);
+		btnFlowPanePos2.setVisible(false);
+		btnFlowPanePos3.setVisible(false);
+		btnFlowPanePos4.setVisible(false);
+		if (aGamePlay.isGameInProgress()) {
+			btnStartGame.setVisible(false);
+			btnDeal.setVisible(true);	
+			switch (myPos) {
+			case 1:
+				btnFlowPanePos1.setVisible(true);
+				break;
+			case 2:
+				btnFlowPanePos2.setVisible(true);
+				break;
+			case 3:
+				btnFlowPanePos3.setVisible(true);
+				break;
+			case 4:
+				btnFlowPanePos4.setVisible(true);
+				break;
+			}	
+		} else {
+			btnStartGame.setVisible(true);
+			btnDeal.setVisible(false);
+		}
 	}
 	
 	public void showCards(GamePlay aGamePlay, Player aPlayer) {
@@ -325,7 +349,6 @@ public class PokerTableController {
 		cbiv.setPreserveRatio(true);
 		HBox hb = null;
 		Player myself = this.mainApp.getPlayer();
-		//btnFlowPanePos1.setVisible(false);
 		switch (aPlayer.getiPlayerPosition()) {
 		case 1:
 			hb = hBoxPos1;
@@ -334,12 +357,11 @@ public class PokerTableController {
 			hb = hBoxPos2;
 			break;
 		case 3:
-			hb  = hBoxPos3;
+			hb = hBoxPos3;
 			break;
 		case 4:
 			hb = hBoxPos4;
 			break;
-			
 		}
 		hb.getChildren().clear();
 		ArrayList<Card> cards = null;
@@ -361,10 +383,6 @@ public class PokerTableController {
 			hb.getChildren().add(iv);
 			
 		}
-	}
-	
-	public void showButtons(GamePlay aGamePlay, Player aPlayer) {
-		
 	}
 	
 	
