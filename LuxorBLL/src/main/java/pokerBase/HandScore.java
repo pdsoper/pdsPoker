@@ -73,7 +73,7 @@ public class HandScore implements Serializable {
 			ans += ", LoHand = " + eRank.getRank(this.getLoHand());
 		}
 		if (this.getKickers().size() > 0) {
-			ans += ", Kickers = ";
+			ans += ", kickers = ";
 			for (Card c : this.getKickers()) {
 				ans +=  c.toString() + " ";
 			}

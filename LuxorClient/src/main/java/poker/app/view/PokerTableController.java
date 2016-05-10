@@ -281,8 +281,9 @@ public class PokerTableController {
 			break;
 		}
 
-		if (HubGamePlay.winner() != null) {
-			this.txtPlayerArea.appendText(HubGamePlay.scoreReport());
+		this.txtPlayerArea.setText(HubGamePlay.scoreReport());
+		if (HubGamePlay.winner() != null){
+			this.txtPlayerArea.appendText("\nClick Start to play another hand");
 		}
 		for (Player aPlayer : HubGamePlay.getGamePlayers().values()) {
 			showCards(HubGamePlay, aPlayer);

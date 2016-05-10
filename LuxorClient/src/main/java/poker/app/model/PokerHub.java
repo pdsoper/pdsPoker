@@ -105,13 +105,18 @@ public class PokerHub extends Hub {
 				// 'Dealer'...
 				// < 5 lines of code to pick random player
 
-				Player PlayerRandom = HubPokerTable.PickRandomPlayerAtTable();
+				Player PlayerDealer = null;
+				if (HubGamePlay == null) {					
+					PlayerDealer = HubPokerTable.PickRandomPlayerAtTable();
+				} else {
+					PlayerDealer = HubGamePlay.nextDealer();
+				}
 
 				// Start a new instance of GamePlay, based on rule set and
 				// Dealer (Player.PlayerID)
 				// 1 line of code
 
-				HubGamePlay = new GamePlay(rle, PlayerRandom.getPlayerID());
+				HubGamePlay = new GamePlay(rle, PlayerDealer.getPlayerID());
 
 				// There are 1+ players seated at the table... add these players
 				// to the game
@@ -137,7 +142,7 @@ public class PokerHub extends Hub {
 				// Order should be 1, 2, 4
 				// < 10 lines of code
 
-				int[] iPlayerOrder = GamePlay.GetOrder(PlayerRandom.getiPlayerPosition());
+				int[] iPlayerOrder = GamePlay.GetOrder(PlayerDealer.getiPlayerPosition());
 
 				HubGamePlay.setiActOrder(iPlayerOrder);
 
@@ -161,8 +166,9 @@ public class PokerHub extends Hub {
 				sendToAll(HubGamePlay);
 				break;
 			case Deal:
-				this.currentDraw = this.currentDraw.next();
-				if (HubGamePlay.getRule().hasDrawCount(this.currentDraw)) {
+				eDrawCount nextDraw = this.currentDraw.next();
+				if (nextDraw != null && HubGamePlay.getRule().hasDrawCount(nextDraw)) {
+					this.currentDraw = nextDraw;
 					System.out.println(this.currentDraw + " draw");
 					DealCards();
 				} else {

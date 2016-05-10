@@ -37,6 +37,7 @@ public class GamePlay implements Serializable   {
 	private int[] iActOrder = null;
 	private Player PlayerNextToAct = null;
 	
+	
 	public GamePlay(Rule rle, UUID GameDealerID)
 	{
 		this.GameID = UUID.randomUUID();
@@ -245,6 +246,31 @@ public class GamePlay implements Serializable   {
 		}
 	}
 	
+	public int nPlayers() {
+		return this.hmGamePlayers.size();
+	}
+	
+	public Player nextDealer() {
+		if (this.GameDealer == null || this.rle == null) return null;
+		Player currentDealer = this.hmGamePlayers.get(this.GameDealer);
+		int currentDealerPos = currentDealer.getiPlayerPosition();
+		int maxPlayers = this.rle.GetMaxNumberOfPlayers();
+		Player nextDealer = null;
+		int np  = this.nPlayers();
+		for (int i = 1 ; i < maxPlayers; i++) {
+			int nextDealerPos = currentDealerPos + i;
+			if (nextDealerPos > maxPlayers) {
+				nextDealerPos = nextDealerPos - maxPlayers;
+			}
+			System.out.println("current = " + currentDealerPos + ", next = " + nextDealerPos);
+			nextDealer = this.getPlayerByPosition(nextDealerPos);
+			if (nextDealer != null) {
+				break;
+			}
+		}
+		return nextDealer;
+	}
+	
 	public String scoreReport() {
 		Player winner = this.winner();
 		if (winner == null) {
@@ -252,7 +278,7 @@ public class GamePlay implements Serializable   {
 		}
 		String ans = "";
 		GamePlayPlayerHand gpphw = null;
-		ans += "\n" + winner.getPlayerName() + " wins!\n";
+		ans += winner.getPlayerName() + " wins!\n";
 		gpphw = this.playerGPPH(winner);
 		ans += gpphw.getHand().getHandScore().toString();
 		for (GamePlayPlayerHand gpph : this.GamePlayerHand) {
