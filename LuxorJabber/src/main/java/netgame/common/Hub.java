@@ -237,7 +237,7 @@ public class Hub {
      * @return
      */
     public int nPlayerConnections() {
-    	return this.getPlayerList().length;
+    	return this.playerConnections.size();
     }
     
     /**
