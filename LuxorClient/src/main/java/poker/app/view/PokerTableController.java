@@ -315,7 +315,12 @@ public class PokerTableController {
 			break;
 		}
 		hb.getChildren().clear();
-		ArrayList<Card> cards = gpph.getHand().getCardsInHand(); 
+		ArrayList<Card> cards = null;
+		if (aGamePlay.winner() == null) {
+			cards = gpph.getHand().getCardsInHand(); 
+		} else {
+			cards = gpph.getHand().getBestCardsInHand();
+		}
 		for (Card c : cards) {
 			if (gpph.playerCardVisible(myself, c)) {
 				imgUrl = imgPath + c.getiCardNbr() + imgExt;

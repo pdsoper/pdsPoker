@@ -59,7 +59,7 @@ public class Hand implements Serializable {
 		CardsInHand = cardsInHand;
 	}
 
-	private ArrayList<Card> getBestCardsInHand() {
+	public ArrayList<Card> getBestCardsInHand() {
 		return BestCardsInHand;
 	}
 
