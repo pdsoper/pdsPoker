@@ -256,13 +256,11 @@ public class GamePlay implements Serializable   {
 		int currentDealerPos = currentDealer.getiPlayerPosition();
 		int maxPlayers = this.rle.GetMaxNumberOfPlayers();
 		Player nextDealer = null;
-		int np  = this.nPlayers();
 		for (int i = 1 ; i < maxPlayers; i++) {
 			int nextDealerPos = currentDealerPos + i;
 			if (nextDealerPos > maxPlayers) {
 				nextDealerPos = nextDealerPos - maxPlayers;
 			}
-			System.out.println("current = " + currentDealerPos + ", next = " + nextDealerPos);
 			nextDealer = this.getPlayerByPosition(nextDealerPos);
 			if (nextDealer != null) {
 				break;

@@ -75,9 +75,13 @@ public class GamePlayPlayerHand implements Serializable {
 	}
 	
 	public boolean playerCardVisible(Player p, Card c) {
-		return this.player.equals(p)
-			|| this.WinningPlayer != null
-			|| this.cardVisibility.get(c) == eCardVisibility.VisibleEveryone;
+		if (this.isFolded()) {
+			return false;
+		} else {
+			return this.player.equals(p)
+				|| this.WinningPlayer != null
+				|| this.cardVisibility.get(c) == eCardVisibility.VisibleEveryone;
+		}
 	}
 	
 	public Player getWinningPlayer() {
