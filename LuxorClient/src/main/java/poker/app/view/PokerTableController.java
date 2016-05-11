@@ -87,6 +87,16 @@ public class PokerTableController {
 	private Button btnStartGame;
 	
 	@FXML
+	private Button btnPlayer1Fold;
+	@FXML
+	private Button btnPlayer2Fold;
+	@FXML
+	private Button btnPlayer3Fold;
+	@FXML
+	private Button btnPlayer4Fold;
+
+	
+	@FXML
 	private ToggleButton btnPos1SitLeave;
 	@FXML
 	private ToggleButton btnPos2SitLeave;
@@ -195,12 +205,6 @@ public class PokerTableController {
 		lblPos2Name.setText("");
 		lblPos3Name.setText("");
 		lblPos4Name.setText("");
-		
-		// Failed attempt to change color for labels that hold player names
-		lblPos1Name.setStyle("color:white");
-		lblPos2Name.setStyle("color:white");
-		lblPos3Name.setStyle("color:white");
-		lblPos4Name.setStyle("color:white");
 
 		//scanInputControls(OuterBorderPane, "SitLeave",true);
 		
@@ -295,6 +299,7 @@ public class PokerTableController {
 			break;
 		}
 		
+		// Uncommenting this line breaks the code
 		// this.showButtons(HubGamePlay);
 
 		this.txtPlayerArea.setText(HubGamePlay.scoreReport());
@@ -309,25 +314,25 @@ public class PokerTableController {
 	
 	public void showButtons(GamePlay aGamePlay) {
 		int myPos = this.mainApp.getPlayer().getiPlayerPosition();
-		btnFlowPanePos1.setVisible(false);
-		btnFlowPanePos2.setVisible(false);
-		btnFlowPanePos3.setVisible(false);
-		btnFlowPanePos4.setVisible(false);
+		btnPlayer1Fold.setVisible(false);
+		btnPlayer2Fold.setVisible(false);
+		btnPlayer3Fold.setVisible(false);
+		btnPlayer4Fold.setVisible(false);
 		if (aGamePlay.isGameInProgress()) {
 			btnStartGame.setVisible(false);
 			btnDeal.setVisible(true);	
 			switch (myPos) {
 			case 1:
-				btnFlowPanePos1.setVisible(true);
+				btnPlayer1Fold.setVisible(true);
 				break;
 			case 2:
-				btnFlowPanePos2.setVisible(true);
+				btnPlayer2Fold.setVisible(true);
 				break;
 			case 3:
-				btnFlowPanePos3.setVisible(true);
+				btnPlayer3Fold.setVisible(true);
 				break;
 			case 4:
-				btnFlowPanePos4.setVisible(true);
+				btnPlayer4Fold.setVisible(true);
 				break;
 			}	
 		} else {
@@ -402,13 +407,6 @@ public class PokerTableController {
 		mainApp.messageSend(act);
 	}
 	
-	@FXML
-	void btnDraw_Click(ActionEvent event) {
-		Action act = new Action(eAction.Draw, mainApp.getPlayer());
-		mainApp.messageSend(act);
-		
-	}
-
 	@FXML
 	public void btnFold_Click(ActionEvent event) {
 		Button btnFold = (Button) event.getSource();

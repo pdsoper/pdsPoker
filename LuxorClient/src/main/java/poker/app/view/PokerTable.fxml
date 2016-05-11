@@ -36,7 +36,7 @@
                               <Button id="btnPlayer1Fold" mnemonicParsing="false" onAction="#btnFold_Click" prefWidth="80.0" text="Fold" />
                               <Button mnemonicParsing="false" onAction="#btnCheck_Click" prefWidth="80.0" text="Check" />
                               <Button mnemonicParsing="false" prefWidth="80.0" text="Bet" />
-                              <Button id="btnPlayer1Fold" mnemonicParsing="false" prefWidth="80.0" text="Raise" />
+                              <Button id="btnPlayer1Raise" mnemonicParsing="false" prefWidth="80.0" text="Raise" />
                            </children>
                         </FlowPane>
                      </children>
@@ -47,7 +47,7 @@
                   <HBox fx:id="hBoxPos1" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" />
                   <HBox id="txtPlayer1Name" prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <Label id="txtPos1Name" fx:id="lblPos1Name"/>
+                        <Label id="txtPos1Name" fx:id="lblPos1Name" />
                      </children>
                   </HBox>
                   <HBox prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="1">
@@ -89,10 +89,10 @@
                   </HBox>
                   <FlowPane prefHeight="50.0" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <children>
-                        <Button id="btnPlayer1Fold" mnemonicParsing="false" onAction="#btnFold_Click" prefWidth="80.0" text="Fold" />
+                        <Button id="btnPlayer3Fold" mnemonicParsing="false" onAction="#btnFold_Click" prefWidth="80.0" text="Fold" />
                         <Button mnemonicParsing="false" onAction="#btnCheck_Click" prefWidth="80.0" text="Check" />
                         <Button mnemonicParsing="false" prefWidth="80.0" text="Bet" />
-                        <Button id="btnPlayer1Fold" mnemonicParsing="false" prefWidth="80.0" text="Raise" />
+                        <Button id="btnPlayer3Raise" mnemonicParsing="false" prefWidth="80.0" text="Raise" />
                      </children>
                   </FlowPane>
                   <HBox fx:id="hBoxPos3" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" />
@@ -158,10 +158,10 @@
                      <children>
                         <FlowPane id="btnFlowPanePos1" prefHeight="112.0" prefWidth="333.0">
                            <children>
-                              <Button id="btnPlayer1Fold" mnemonicParsing="false" onAction="#btnFold_Click" prefWidth="80.0" text="Fold" />
+                              <Button id="btnPlayer2Fold" mnemonicParsing="false" onAction="#btnFold_Click" prefWidth="80.0" text="Fold" />
                               <Button mnemonicParsing="false" onAction="#btnCheck_Click" prefWidth="80.0" text="Check" />
                               <Button mnemonicParsing="false" prefWidth="80.0" text="Bet" />
-                              <Button id="btnPlayer1Fold" mnemonicParsing="false" prefWidth="80.0" text="Raise" />
+                              <Button id="btnPlayer2Raise" mnemonicParsing="false" prefWidth="80.0" text="Raise" />
                            </children>
                         </FlowPane>
                      </children>
@@ -211,10 +211,10 @@
                      <children>
                         <FlowPane prefHeight="112.0" prefWidth="333.0">
                            <children>
-                              <Button id="btnPlayer1Fold" mnemonicParsing="false" onAction="#btnFold_Click" prefWidth="80.0" text="Fold" />
+                              <Button id="btnPlayer4Fold" mnemonicParsing="false" onAction="#btnFold_Click" prefWidth="80.0" text="Fold" />
                               <Button mnemonicParsing="false" onAction="#btnCheck_Click" prefWidth="80.0" text="Check" />
                               <Button mnemonicParsing="false" prefWidth="80.0" text="Bet" />
-                              <Button id="btnPlayer1Fold" mnemonicParsing="false" prefWidth="80.0" text="Raise" />
+                              <Button id="btnPlayer4Raise" mnemonicParsing="false" prefWidth="80.0" text="Raise" />
                            </children>
                         </FlowPane>
                      </children>
