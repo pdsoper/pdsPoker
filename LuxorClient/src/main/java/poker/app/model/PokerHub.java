@@ -173,6 +173,9 @@ public class PokerHub extends Hub {
 				break;
 			case Deal:
 				eDrawCount nextDraw = this.currentDraw.next();
+				if (HubGamePlay.winner() != null) {
+					break;
+				}
 				if (nextDraw != null && HubGamePlay.getRule().hasDrawCount(nextDraw)) {
 					this.currentDraw = nextDraw;
 					System.out.println(this.currentDraw + " draw");

@@ -69,12 +69,17 @@ public class PokerTableController {
 	public PokerTableController() {
 	}
 	
-	@FXML private ImageView imgViewDealerButtonPos1;
-	@FXML private ImageView imgViewDealerButtonPos2;
-	@FXML private ImageView imgViewDealerButtonPos3;
-	@FXML private ImageView imgViewDealerButtonPos4;
+	@FXML 
+	private ImageView imgViewDealerButtonPos1;
+	@FXML 
+	private ImageView imgViewDealerButtonPos2;
+	@FXML 
+	private ImageView imgViewDealerButtonPos3;
+	@FXML 
+	private ImageView imgViewDealerButtonPos4;
 	
-	@FXML private BorderPane OuterBorderPane;
+	@FXML 
+	private BorderPane OuterBorderPane;
 
 	@FXML
 	private Label lblNumberOfPlayers;
@@ -85,16 +90,6 @@ public class PokerTableController {
 	private Button btnDeal;	
 	@FXML
 	private Button btnStartGame;
-	
-	@FXML
-	private Button btnPlayer1Fold;
-	@FXML
-	private Button btnPlayer2Fold;
-	@FXML
-	private Button btnPlayer3Fold;
-	@FXML
-	private Button btnPlayer4Fold;
-
 	
 	@FXML
 	private ToggleButton btnPos1SitLeave;
@@ -133,6 +128,15 @@ public class PokerTableController {
 	private FlowPane btnFlowPanePos4;
 
 	@FXML
+	private Button btnPlayer1Fold;
+	@FXML
+	private Button btnPlayer2Fold;
+	@FXML
+	private Button btnPlayer3Fold;
+	@FXML
+	private Button btnPlayer4Fold;
+	
+	@FXML
 	private void initialize() {
 		imgViewDealerButtonPos1.setImage(new Image("/img/d-button.png"));
 		imgViewDealerButtonPos2.setImage(new Image("/img/d-button.png"));
@@ -147,7 +151,6 @@ public class PokerTableController {
 	
 	public void setMainApp(MainApp mainApp) {
 		this.mainApp = mainApp;
-
 	}
 
 	public void setlblNumberOfPlayers(Table tbl) {
@@ -300,12 +303,12 @@ public class PokerTableController {
 		}
 		
 		// Uncommenting this line breaks the code
-		// this.showButtons(HubGamePlay);
+	    // this.showButtons(HubGamePlay);
 
 		this.txtPlayerArea.setText(HubGamePlay.scoreReport());
 		if (HubGamePlay.winner() != null){
 			this.txtPlayerArea.appendText("\nClick Start to play another hand");
-		}
+		} 
 		for (Player aPlayer : HubGamePlay.getGamePlayers().values()) {
 			showCards(HubGamePlay, aPlayer);
 		}
@@ -314,6 +317,7 @@ public class PokerTableController {
 	
 	public void showButtons(GamePlay aGamePlay) {
 		int myPos = this.mainApp.getPlayer().getiPlayerPosition();
+		// btnPlayer1Fold is null and triggers a NullPointerException
 		btnPlayer1Fold.setVisible(false);
 		btnPlayer2Fold.setVisible(false);
 		btnPlayer3Fold.setVisible(false);
