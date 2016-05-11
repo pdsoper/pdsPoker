@@ -34,7 +34,7 @@ public class PokerHub extends Hub {
 	private int iDealNbr = 0;
 	// private PokerGameState state;
 	private eGameState eGameState;
-	private eDrawCount currentDraw;
+	private eDrawCount currentDraw = null;
 
 	public PokerHub(int port) throws IOException {
 		super(port);
@@ -94,6 +94,9 @@ public class PokerHub extends Hub {
 			case StartGame:
 				// System.out.println("Starting Game!");
 				resetOutput();
+				if (this.currentDraw != null) {
+					return;
+				}
 
 				// Determine which game is selected (from RootTableController)
 				// 1 line of code
@@ -115,6 +118,7 @@ public class PokerHub extends Hub {
 				if (HubGamePlay == null) {					
 					PlayerDealer = HubPokerTable.PickRandomPlayerAtTable();
 				} else {
+					//
 					PlayerDealer = HubGamePlay.nextDealer();
 				}
 
@@ -182,6 +186,7 @@ public class PokerHub extends Hub {
 					DealCards();
 				} else {
 					this.ScoreHands();
+					this.currentDraw = null;
 				}
 				sendToAll(HubGamePlay);
 				break;
