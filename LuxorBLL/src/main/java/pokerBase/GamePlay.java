@@ -260,6 +260,9 @@ public class GamePlay implements Serializable   {
 	public Player nextDealer() {
 		if (this.GameDealer == null || this.rle == null) return null;
 		Player currentDealer = this.hmGamePlayers.get(this.GameDealer);
+		if (this.hmGamePlayers.size() == 1) {
+			return currentDealer;
+		}
 		int currentDealerPos = currentDealer.getiPlayerPosition();
 		int maxPlayers = this.rle.GetMaxNumberOfPlayers();
 		Player nextDealer = null;

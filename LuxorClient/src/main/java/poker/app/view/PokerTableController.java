@@ -302,7 +302,7 @@ public class PokerTableController {
 			break;
 		}
 		
-		// Uncommenting this line breaks the code
+		// Uncommenting the next line breaks the code
 	    // this.showButtons(HubGamePlay);
 
 		this.txtPlayerArea.setText(HubGamePlay.scoreReport());
@@ -317,7 +317,7 @@ public class PokerTableController {
 	
 	public void showButtons(GamePlay aGamePlay) {
 		int myPos = this.mainApp.getPlayer().getiPlayerPosition();
-		// btnFlowPanePos1 is null and triggers a NullPointerException
+		// FIXME btnFlowPanePos1 is null, so the next line triggers a NullPointerException
 		btnFlowPanePos1.setVisible(false);
 		btnFlowPanePos2.setVisible(false);
 		btnFlowPanePos3.setVisible(false);
