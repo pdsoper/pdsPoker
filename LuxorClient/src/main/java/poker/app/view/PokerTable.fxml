@@ -47,7 +47,7 @@
                   <HBox fx:id="hBoxPos1" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" />
                   <HBox id="txtPlayer1Name" prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <Label id="txtPos1Name" fx:id="lblPos1Name" />
+                        <Label id="txtPos1Name" fx:id="lblPos1Name"/>
                      </children>
                   </HBox>
                   <HBox prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="1">
@@ -84,7 +84,7 @@
                <children>
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <Label id="txtPos3Name" fx:id="lblPos3Name" style="-fx-font-weight: strong; -fx-text-fill: white; -fx-font-size: 10; -fx-background-color: white; color: blue;" />
+                        <Label id="txtPos3Name" fx:id="lblPos3Name" />
                      </children>
                   </HBox>
                   <FlowPane prefHeight="50.0" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1">

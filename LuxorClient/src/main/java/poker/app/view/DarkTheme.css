@@ -3,10 +3,10 @@
 }
 
 .label {
-    -fx-font-size: 11pt;
+    -fx-font-size: 12pt;
     -fx-font-family: "Segoe UI Semibold";
-    -fx-text-fill: black;
-    -fx-opacity: 0.6;
+    -fx-text-fill: white;
+    -fx-opacity: 1.0;
 }
 
 .label-bright {
