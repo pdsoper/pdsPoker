@@ -317,26 +317,26 @@ public class PokerTableController {
 	
 	public void showButtons(GamePlay aGamePlay) {
 		int myPos = this.mainApp.getPlayer().getiPlayerPosition();
-		// btnPlayer1Fold is null and triggers a NullPointerException
-		btnPlayer1Fold.setVisible(false);
-		btnPlayer2Fold.setVisible(false);
-		btnPlayer3Fold.setVisible(false);
-		btnPlayer4Fold.setVisible(false);
+		// btnFlowPanePos1 is null and triggers a NullPointerException
+		btnFlowPanePos1.setVisible(false);
+		btnFlowPanePos2.setVisible(false);
+		btnFlowPanePos3.setVisible(false);
+		btnFlowPanePos4.setVisible(false);
 		if (aGamePlay.isGameInProgress()) {
 			btnStartGame.setVisible(false);
 			btnDeal.setVisible(true);	
 			switch (myPos) {
 			case 1:
-				btnPlayer1Fold.setVisible(true);
+				btnFlowPanePos1.setVisible(true);
 				break;
 			case 2:
-				btnPlayer2Fold.setVisible(true);
+				btnFlowPanePos2.setVisible(true);
 				break;
 			case 3:
-				btnPlayer3Fold.setVisible(true);
+				btnFlowPanePos3.setVisible(true);
 				break;
 			case 4:
-				btnPlayer4Fold.setVisible(true);
+				btnFlowPanePos4.setVisible(true);
 				break;
 			}	
 		} else {
