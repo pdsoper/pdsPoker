@@ -208,6 +208,8 @@ public class PokerTableController {
 		lblPos2Name.setText("");
 		lblPos3Name.setText("");
 		lblPos4Name.setText("");
+		
+		this.showInitialButtons();
 
 		//scanInputControls(OuterBorderPane, "SitLeave",true);
 		
@@ -223,6 +225,7 @@ public class PokerTableController {
 
 		btnStartGame.setDisable(HubPokerTable.getHashPlayers().size() > 0 ? false : true);
 
+		
 		FadeButton(btnStartGame);
 		Iterator it = HubPokerTable.getHashPlayers().entrySet().iterator();
 		while (it.hasNext()) {
@@ -302,8 +305,7 @@ public class PokerTableController {
 			break;
 		}
 		
-		// Uncommenting the next line breaks the code
-	    // this.showButtons(HubGamePlay);
+	    this.showButtons(HubGamePlay);
 
 		this.txtPlayerArea.setText(HubGamePlay.scoreReport());
 		if (HubGamePlay.winner() != null){
@@ -315,9 +317,21 @@ public class PokerTableController {
 
 	}
 	
+	public void showInitialButtons() {
+		btnStartGame.setVisible(true);
+		btnDeal.setVisible(false);
+		imgViewDealerButtonPos1.setVisible(false);
+		imgViewDealerButtonPos2.setVisible(false);
+		imgViewDealerButtonPos3.setVisible(false);
+		imgViewDealerButtonPos4.setVisible(false);
+		btnFlowPanePos1.setVisible(false);
+		btnFlowPanePos2.setVisible(false);
+		btnFlowPanePos3.setVisible(false);
+		btnFlowPanePos4.setVisible(false);
+	}
+	
 	public void showButtons(GamePlay aGamePlay) {
 		int myPos = this.mainApp.getPlayer().getiPlayerPosition();
-		// FIXME btnFlowPanePos1 is null, so the next line triggers a NullPointerException
 		btnFlowPanePos1.setVisible(false);
 		btnFlowPanePos2.setVisible(false);
 		btnFlowPanePos3.setVisible(false);
