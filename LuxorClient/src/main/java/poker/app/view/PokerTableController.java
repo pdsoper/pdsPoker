@@ -181,15 +181,19 @@ public class PokerTableController {
 			switch (btnSitLeave.getId().toString()) {
 			case "btnPos1SitLeave":
 				iPlayerPosition = ePlayerPosition.ONE.getiPlayerPosition();
+				hBoxPos1.getChildren().clear();
 				break;
 			case "btnPos2SitLeave":
 				iPlayerPosition = ePlayerPosition.TWO.getiPlayerPosition();
+				hBoxPos2.getChildren().clear();
 				break;
 			case "btnPos3SitLeave":
 				iPlayerPosition = ePlayerPosition.THREE.getiPlayerPosition();
+				hBoxPos3.getChildren().clear();
 				break;
 			case "btnPos4SitLeave":
 				iPlayerPosition = ePlayerPosition.FOUR.getiPlayerPosition();
+				hBoxPos4.getChildren().clear();
 				break;
 			}
 		} else {
