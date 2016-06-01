@@ -59,8 +59,10 @@ public class Deck implements Serializable  {
 	 * @param wildCards
 	 */
 	public Deck(int nJokers, ArrayList<WildCard> wildCards) {
-		this(nJokers);
-		this.replaceWithWild(wildCards);
+		this(wildCards);
+		for (int i = 0; i < nJokers; i++) {
+			this.cards.add(new Joker());
+		}
 		Collections.shuffle(this.cards);	
 	}
 	
@@ -74,7 +76,8 @@ public class Deck implements Serializable  {
 				if (c.isWild()) {
 					continue;
 				}
-				if (c.rankAndSuitEquals(wc)) {
+				if (c.getRank() == wc.getFaceRank()
+						&& c.getSuit() == wc.getFaceSuit()) {
 					this.cards.remove(c);
 					this.cards.add(wc);
 					break;

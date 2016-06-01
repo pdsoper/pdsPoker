@@ -24,8 +24,6 @@ public class DeckTest {
 	public final void testConstructor() {
 		Deck dk = new Deck();
 		assertEquals(dk.nCards(), 52);
-		// System.out.println("Basic deck");
-		// System.out.println(dk);
 	}
 	
 	@Test
@@ -33,8 +31,6 @@ public class DeckTest {
 		int nJokers = 2;
 		Deck dk = new Deck(nJokers);
 		assertEquals(dk.nCards(), 54);
-		// System.out.println("Deck with " + nJokers + " Jokers" );
-		// System.out.println(dk);
 	}
 	
 	@Test
@@ -46,8 +42,6 @@ public class DeckTest {
 		wcal.add(new WildCard(Rank.TWO, Suit.DIAMONDS));
 		Deck dk = new Deck(wcal);
 		assertEquals(dk.nCards(), 52);
-		// System.out.println("Deck with deuces wild" );
-		// System.out.println(dk);
 	}
 		
 	@Test
@@ -60,8 +54,6 @@ public class DeckTest {
 		wcal.add(new WildCard(Rank.TWO, Suit.DIAMONDS));
 		Deck dk = new Deck(nJokers, wcal);
 		assertEquals(dk.nCards(), 54);
-		// System.out.println("Deck with " + nJokers + " Jokers and deuces wild" );
-		// System.out.println(dk);
 	}
 		
 	/**
@@ -102,13 +94,15 @@ public class DeckTest {
 
 	@Test
 	public final void toStringTest() {
+		int nJokers = 2;
 		ArrayList<WildCard> wcal = new ArrayList<WildCard>();
 		wcal.add(new WildCard(Rank.TWO, Suit.HEARTS));
 		wcal.add(new WildCard(Rank.TWO, Suit.CLUBS));
 		wcal.add(new WildCard(Rank.TWO, Suit.SPADES));
 		wcal.add(new WildCard(Rank.TWO, Suit.DIAMONDS));
-		Deck dk = new Deck(2, wcal);
-		System.out.println("Deck\n" + dk);
+		Deck dk = new Deck(nJokers, wcal);
+		System.out.println("Deck with " + nJokers + " jokers and deuces wild" );
+		System.out.println(dk);
 		assertTrue(true);
 	
 	}

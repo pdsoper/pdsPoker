@@ -18,7 +18,10 @@ private static int JokerCount = 0;
 
 	@Override
 	public String toString() {
-		return "" + this.getRank() + this.getSuit() + " (Joker)";
+		String jokerStr = "";
+		jokerStr += (this.getRank() == null) ? "_" : this.getRank();
+		jokerStr += (this.getSuit() == null) ? "_" : this.getSuit();
+		return jokerStr + " (Joker)";
 	}
 	
 }

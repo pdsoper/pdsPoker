@@ -92,9 +92,10 @@ public class Game {
 	}
 	
 	public String toString() {
-		String gameStr = this.name + ", " + this.nDeals() + " deals";
+		String gameStr = this.name + ", " + this.nDeals() + " deal";
+		gameStr += (this.nDeals() == 1) ? "\n" : "s\n";
 		for (int i = 0; i < this.deals.size(); i++) {
-			gameStr += "Deal " + (i + 1) + "\n";
+			gameStr += "Deal " + i + "\n";
 			for (int j = 0; j < this.getDeal(i).size(); j++) {
 				gameStr += "    " + this.deals.get(i).get(j) + "\n";
 			}

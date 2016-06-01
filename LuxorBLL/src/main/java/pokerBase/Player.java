@@ -18,11 +18,7 @@ public class Player implements Serializable {
 	public String getName() {
 		return name;
 	}
-	
-	public void setName(String name) {
-		this.name = name;
-	}
-	
+		
 	public Hand getHand() {
 		return currentHand;
 	}

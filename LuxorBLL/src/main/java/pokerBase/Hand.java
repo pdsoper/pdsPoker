@@ -200,7 +200,7 @@ public class Hand implements Comparable<Hand>, Serializable {
 		Hand bestSoFar = WorstHand();
 		Suit s = this.cards.get(4).getSuit();
 		WildCard wc1 = (WildCard) this.cards.get(0);
-		WildCard wc2 = (WildCard) this.cards.get(0);
+		WildCard wc2 = (WildCard) this.cards.get(1);
 		wc1.setSuit(s);
 		wc2.setSuit(s);
 		for (Rank r1 : Rank.values()) {
