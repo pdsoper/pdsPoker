@@ -28,7 +28,7 @@ public class CardTest {
 	 * Test method for {@link pokerBase.Card#rankEquals(pokerBase.Card)}.
 	 */
 	@Test
-	public final void testEqualsCard() {
+	public final void rankEqualsTest() {
 		assertTrue(twoOfClubs.rankEquals(twoOfHearts));
 		assertTrue(aceOfHearts.rankEquals(aceOfSpades));
 		assertFalse(aceOfHearts.rankEquals(twoOfClubs));
@@ -39,7 +39,7 @@ public class CardTest {
 	 * Test method for {@link pokerBase.Card#equalsSuit(pokerBase.Card)}.
 	 */
 	@Test
-	public final void testEqualsSuit() {
+	public final void suitEqualsTest() {
 		assertTrue(twoOfClubs.suitEquals(nineOfClubs));
 		assertTrue(fourOfHearts.suitEquals(aceOfHearts));
 		assertFalse(fourOfDiamonds.suitEquals(nineOfClubs));
@@ -50,7 +50,7 @@ public class CardTest {
 	 * Test method for {@link pokerBase.Card#compareTo(java.lang.Object)}.
 	 */
 	@Test
-	public final void testCompareTo1() {
+	public final void compareToTest() {
 		assertEquals(fourOfDiamonds.compareTo(queenOfDiamonds),8);
 		assertEquals(twoOfClubs.compareTo(aceOfSpades),12);
 		assertEquals(twoOfClubs.compareTo(twoOfHearts),0);
@@ -60,7 +60,7 @@ public class CardTest {
 	 * Test method for {@link pokerBase.Card#getRank}.
 	 */
 	@Test
-	public final void getRank(){
+	public final void getRankTest(){
 		assertEquals(twoOfClubs.getRank(), Rank.TWO); 
 		assertEquals(fourOfDiamonds.getRank(), Rank.FOUR);
 	}
@@ -69,9 +69,15 @@ public class CardTest {
 	 * Test method for {@link pokerBase.Card#getSuit}.
 	 */
 	@Test
-	public final void getSuit(){
+	public final void getSuitTest(){
 		assertEquals(twoOfClubs.getSuit(), Suit.CLUBS);
 		assertEquals(fourOfDiamonds.getSuit(), Suit.DIAMONDS);
+	}
+	
+	@Test
+	public final void toStringTest() {
+		System.out.println("Card : " + twoOfClubs);
+		assertTrue(true);
 	}
 
 }

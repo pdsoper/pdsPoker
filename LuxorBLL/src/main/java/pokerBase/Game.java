@@ -16,6 +16,11 @@ public class Game {
 	
 	public static ArrayList<String> GameNames = new ArrayList<String>();
 	
+	static {
+		FiveCardDraw();
+		FiveCardStud();
+	}
+	
 	/**
 	 * Five Card Draw has one deal of five draws, all face down.
 	 * @return a Game with the one deal

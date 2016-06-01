@@ -479,40 +479,13 @@ public class HandTest {
 		}
 	}	
 	
-	// @Test
-	public void printAll() {
-		ArrayList<Hand> handsInOrder = new ArrayList<Hand>(23);
-		handsInOrder.add(royalFlush);
-		handsInOrder.add(highStraightFlush);
-		handsInOrder.add(lowStraightFlush);
-		handsInOrder.add(highFourOfaKind);
-		handsInOrder.add(lowFourOfaKind);
-		handsInOrder.add(highFullHouse);
-		handsInOrder.add(lowFullHouse);
-		handsInOrder.add(highFlush);
-		handsInOrder.add(lowFlush);
-		handsInOrder.add(highStraight);
-		handsInOrder.add(lowStraight);
-		handsInOrder.add(bottomThreeOfaKind);
-		handsInOrder.add(middleThreeOfaKind);
-		handsInOrder.add(topThreeOfaKind);
-		handsInOrder.add(highTwoPair);
-		handsInOrder.add(middleTwoPair);
-		handsInOrder.add(lowTwoPair);
-		handsInOrder.add(onePairOne);
-		handsInOrder.add(onePairTwo);
-		handsInOrder.add(onePairThree);
-		handsInOrder.add(onePairFour);
-		handsInOrder.add(highNoPair);
-		handsInOrder.add(lowNoPair);
-		
-		for (Hand h : handsInOrder) {
-			System.out.print(h + " " + h.getValue() + " with tiebreakers: ");
-			for (Card c: h.getTiebreakers()) {
-				System.out.print(c + " ");
-			}
-			System.out.println();
-		}
+	@Test
+	public final void toStringTest() {
+		System.out.println(bottomStraight);
+		System.out.println(threeWildFourOfaKind);
+		System.out.println(highFullHouse);
+		System.out.println(highNoPair);
+		System.out.println(lowNoPair);
 		assertTrue(true);
 	}
 

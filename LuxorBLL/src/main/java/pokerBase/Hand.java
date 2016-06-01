@@ -669,11 +669,15 @@ public class Hand implements Comparable<Hand>, Serializable {
 
 	public String toString() {
 		String handStr = "";
-		for (Card c : this.tieBreakers) {
+		for (Card c : this.cards) {
 			handStr += c + " ";
 		}
 		if (this.value != null) {
-			handStr += " " + this.getValue() + " with tiebreakers ";
+			handStr += " " + this.getValue() + " with tiebreaker";
+			handStr += (this.tieBreakers.size() == 1) ? " ": "s ";
+			for (Card c : this.tieBreakers) {
+				handStr += c + " ";
+			}
 		}
 		return handStr;
 	}

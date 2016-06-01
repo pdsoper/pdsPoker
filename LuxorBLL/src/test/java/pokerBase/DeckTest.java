@@ -100,4 +100,16 @@ public class DeckTest {
 		assertFalse(dk.nCards() == 51);
 	}
 
+	@Test
+	public final void toStringTest() {
+		ArrayList<WildCard> wcal = new ArrayList<WildCard>();
+		wcal.add(new WildCard(Rank.TWO, Suit.HEARTS));
+		wcal.add(new WildCard(Rank.TWO, Suit.CLUBS));
+		wcal.add(new WildCard(Rank.TWO, Suit.SPADES));
+		wcal.add(new WildCard(Rank.TWO, Suit.DIAMONDS));
+		Deck dk = new Deck(2, wcal);
+		System.out.println("Deck\n" + dk);
+		assertTrue(true);
+	
+	}
 }

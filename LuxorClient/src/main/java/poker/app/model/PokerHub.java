@@ -29,37 +29,30 @@ import pokerExceptions.HandException;
 
 public class PokerHub extends Hub {
 
-	private Table HubPokerTable = new Table();
-	private GamePlay HubGamePlay;
-	private int iDealNbr = 0;
-	// private PokerGameState state;
-	private eGameState eGameState;
-	private eDrawCount currentDraw = null;
+	// Set by the design of the view
+	public static final int MaxPlayers = 4;
+	
+	private Table pokerTable = new Table(MaxPlayers);
 
 	public PokerHub(int port) throws IOException {
 		super(port);
 		this.setAutoreset(true);
 	}
 
-	// Modified for extra credit
+	// Accept no further connections after the table is full.
 	// nPlayerConnections() was added to Hub.java
 	@Override
 	protected void playerConnected(int playerID) {
-		if (HubGamePlay != null) {
-			int nConnections = this.nPlayerConnections();
-			int maxPlayers = HubGamePlay.getRule().GetMaxNumberOfPlayers();
-			if (nConnections == maxPlayers) {
-				shutdownServerSocket();
-			}
+		if (this.nPlayerConnections() == MaxPlayers) {
+			shutdownServerSocket();
 		}
 	}
 
-	// Modified for extra credit
+	// Accept new connections if a player leaves a full table
 	protected void playerDisconnected(int playerID) {
 		int nOld = this.nPlayerConnections();
-		int nMax = HubGamePlay.getRule().GetMaxNumberOfPlayers();
 		this.removePlayerConnection(playerID);
-		if (this.nPlayerConnections() == nMax - 1) {
+		if (this.nPlayerConnections() == MaxPlayers - 1) {
 			try {
 				this.restartServer();
 			} catch (IOException e) {
@@ -73,23 +66,20 @@ public class PokerHub extends Hub {
 
 		if (message instanceof Action) {
 			Action act = (Action) message;
-			switch (act.getAction()) {
-			case GameState:
-				sendToAll(HubPokerTable);
-				break;
+			switch (act.getActionOption()) {
 			case TableState:
 				resetOutput();
-				sendToAll(HubPokerTable);
+				sendToAll(pokerTable);
 				break;
 			case Sit:
 				resetOutput();
-				HubPokerTable.AddPlayerToTable(act.getPlayer());
-				sendToAll(HubPokerTable);
+				pokerTable.AddPlayerToTable(act.getPlayer());
+				sendToAll(pokerTable);
 				break;
 			case Leave:
 				resetOutput();
-				HubPokerTable.RemovePlayerFromTable(act.getPlayer());
-				sendToAll(HubPokerTable);
+				pokerTable.RemovePlayerFromTable(act.getPlayer());
+				sendToAll(pokerTable);
 				break;
 			case StartGame:
 				// System.out.println("Starting Game!");
@@ -116,7 +106,7 @@ public class PokerHub extends Hub {
 
 				Player PlayerDealer = null;
 				if (HubGamePlay == null) {					
-					PlayerDealer = HubPokerTable.PickRandomPlayerAtTable();
+					PlayerDealer = pokerTable.PickRandomPlayerAtTable();
 				} else {
 					//
 					PlayerDealer = HubGamePlay.nextDealer();
@@ -131,7 +121,7 @@ public class PokerHub extends Hub {
 				// There are 1+ players seated at the table... add these players
 				// to the game
 				// < 5 lines of code
-				HubGamePlay.setGamePlayers(HubPokerTable.getHashPlayers());
+				HubGamePlay.setGamePlayers(pokerTable.getHashPlayers());
 				HubGamePlay.initializeHands();
 
 				// GamePlay has a deck... create the deck based on the game's
@@ -173,7 +163,7 @@ public class PokerHub extends Hub {
 
 				// Send the state of the game back to the players
 
-				sendToAll(HubGamePlay);
+				sendToAll(pokerTable);
 				break;
 			case Deal:
 				eDrawCount nextDraw = this.currentDraw.next();
@@ -188,8 +178,10 @@ public class PokerHub extends Hub {
 					this.ScoreHands();
 					this.currentDraw = null;
 				}
-				sendToAll(HubGamePlay);
+				sendToAll(pokerTable);
 				break;
+			default:
+				sendToAll(pokerTable);
 			}
 		}
 

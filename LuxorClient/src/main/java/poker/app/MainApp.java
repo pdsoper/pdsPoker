@@ -31,10 +31,9 @@ import poker.app.view.ClientServerStartController;
 import poker.app.view.PokerTableController;
 import poker.app.view.RootLayoutController;
 import pokerBase.Action;
-import pokerBase.GamePlay;
 import pokerBase.Player;
 import pokerBase.Table;
-import pokerEnums.eAction;
+import pokerEnums.ActionOption;
 
 public class MainApp extends Application {
 
@@ -120,7 +119,7 @@ public class MainApp extends Application {
 			e.printStackTrace();
 		}
 
-		setPlayer(new Player(strPlayerName, pClient.getID()));
+		setPlayer(new Player(strPlayerName));
 		
 		initRootLayout();
 
@@ -185,8 +184,8 @@ public class MainApp extends Application {
 			pokerController = loader.getController();
 			pokerController.setMainApp(this);
 			
-			getPlayer().setiPlayerPosition(0);
-			Action act = new Action(eAction.TableState, getPlayer());
+			// getPlayer().setiPlayerPosition(0);
+			Action act = new Action(ActionOption.TableState, getPlayer());
 			messageSend(act);
 
 		} catch (IOException e) {
@@ -260,10 +259,10 @@ public class MainApp extends Application {
 					//	is finished
 					pokerController.setlblNumberOfPlayers((Table)message);
 				}
-				else if (message instanceof GamePlay)
+				else if (message instanceof Table)
 				{
 					try {
-						pokerController.Handle_GameState((GamePlay)message);
+						pokerController.Handle_Table((Table)message);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

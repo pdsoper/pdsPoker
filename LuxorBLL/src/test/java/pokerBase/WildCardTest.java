@@ -57,5 +57,13 @@ public class WildCardTest {
 		assertEquals(wc.getSuit(), Suit.DIAMONDS);
 	}
 
+	@Test
+	public final void toStringTest() {
+		WildCard wc = new WildCard(Rank.TWO, Suit.HEARTS);
+		wc.setSuit(Suit.DIAMONDS);
+		wc.setRank(Rank.ACE);
+		System.out.println("WildCard : " + wc);
+		assertTrue(true);
+	}
 
 }
