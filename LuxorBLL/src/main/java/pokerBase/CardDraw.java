@@ -2,40 +2,31 @@ package pokerBase;
 
 import java.io.Serializable;
 
-import pokerEnums.eCardCount;
-import pokerEnums.eCardDestination;
-import pokerEnums.eCardVisibility;
+import pokerEnums.CardDestination;
+import pokerEnums.CardVisibility;
 
 public class CardDraw implements Serializable {
-
-	private static final long serialVersionUID = 1L;
-	private eCardCount CardCount;
-	private eCardDestination CardDestination;
-	private eCardVisibility CardVisibility;
 	
-	public CardDraw(eCardCount cardCount, eCardDestination cardDestination, eCardVisibility cardVisibility) {
+	private CardDestination destination;
+	private CardVisibility visibility;
+	
+	public CardDraw(CardDestination destination, CardVisibility visibility) {
 		super();
-		CardCount = cardCount;
-		CardDestination = cardDestination;
-		CardVisibility = cardVisibility;
+		this.destination = destination;
+		this.visibility = visibility;
 	}
 	
-	public eCardCount getCardCount() {
-		return CardCount;
+	public CardDestination getDestination() {
+		return this.destination;
 	}
 	
-	public eCardDestination getCardDestination() {
-		return CardDestination;
+	public CardVisibility getVisibility() {
+		return this.visibility;
 	}
 	
-	public eCardVisibility getCardVisibility() {
-		return CardVisibility;
-	}
-	
+	@Override
 	public String toString() {
-		int nCards = this.CardCount.getCardCount();
-		String countStr = String.valueOf(nCards) + ((nCards == 1) ? " card" : " cards");
-		return "To " + this.CardDestination + " : " + countStr + ", " + this.CardVisibility;
+		return "To " + this.destination + ", " + this.visibility;
 	}
 	
 }

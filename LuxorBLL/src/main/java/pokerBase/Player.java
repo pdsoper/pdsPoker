@@ -6,68 +6,53 @@ import javax.xml.bind.annotation.XmlElement;
 
 public class Player implements Serializable {
 
-	@XmlElement
-	private UUID PlayerID;
-
-	@XmlElement
-	private String PlayerName;
-
-	@XmlElement
-	private int iPlayerPosition;
-
-	@XmlElement
-	private int iPokerClientID;
-
-	public Player() {
-
+	private String name;
+	private boolean active = false;
+	private Hand currentHand;
+	
+	public Player(String name) {
+		this.name = name;
+		this.currentHand = new Hand();
 	}
 
-	public Player(String strPlayerName, int iPokerClientID) {
-		PlayerID = UUID.randomUUID();
-		this.PlayerName = strPlayerName;
-		this.iPlayerPosition = iPlayerPosition;
-		this.iPokerClientID = iPokerClientID;
-	}
-
-	@XmlElement
-	public UUID getPlayerID() {
-		return PlayerID;
-	}
-
-	public void setPlayerID(UUID playerID) {
-		PlayerID = playerID;
-	}
-
-	@XmlElement
-	public String getPlayerName() {
-		return PlayerName;
-	}
-
-	public void setPlayerName(String playerName) {
-		PlayerName = playerName;
-	}
-
-	@XmlElement
-	public int getiPlayerPosition() {
-		return iPlayerPosition;
-	}
-
-	public Player setiPlayerPosition(int iPlayerPosition) {
-		this.iPlayerPosition = iPlayerPosition;
-		return this;
-	}
-
-	public int getiPokerClientID() {
-		return iPokerClientID;
+	public String getName() {
+		return name;
 	}
 	
-	public boolean equals(Player p) {
-		return this.PlayerID.equals(p.getPlayerID());
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public Hand getHand() {
+		return currentHand;
+	}
+	
+	public boolean isActive() {
+		return active;
 	}
 
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
+	public void fold() {
+		this.active = false;
+	}
+
+	public void reset() {
+		this.active = true;
+		this.currentHand.resetHand();
+	}
+		
+	@Override
 	public String toString() {
-		return "Player " + this.PlayerName + " = client " + this.iPokerClientID 
-				+ " in position " + this.iPlayerPosition;
+		String playerStr = "Player : " + this.name;
+		if (this.active) {
+			playerStr += " (active) " + this.getHand();
+		} else {
+			playerStr += " (inactive)";
+		}
+		return playerStr;
 	}
-
+	
 }

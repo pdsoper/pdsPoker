@@ -8,8 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import exceptions.DeckException;
-import exceptions.HandException;
 import netgame.common.Hub;
 import pokerBase.Action;
 import pokerBase.Card;
@@ -22,10 +20,12 @@ import pokerBase.Player;
 import pokerBase.Rule;
 import pokerBase.Table;
 import pokerEnums.eAction;
-import pokerEnums.eCardVisibility;
+import pokerEnums.CardVisibility;
 import pokerEnums.eDrawCount;
 import pokerEnums.eGame;
 import pokerEnums.eGameState;
+import pokerExceptions.DeckException;
+import pokerExceptions.HandException;
 
 public class PokerHub extends Hub {
 
@@ -229,7 +229,7 @@ public class PokerHub extends Hub {
 					continue;
 				} else {
 					try {
-						eCardVisibility visibility = cd.getCardVisibility();
+						CardVisibility visibility = cd.getCardVisibility();
 						HubGamePlay.playerGPPH(aPlayer).addCardToHand(dk.Draw(), visibility);
 					} catch (DeckException e) {
 						e.printStackTrace();

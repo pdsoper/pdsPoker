@@ -4,100 +4,158 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement
+
+import pokerEnums.CardVisibility;
+import pokerExceptions.DeckException;
+
+/**
+ * @author paulsoper
+ *
+ */
 public class Table implements Serializable {
 	
-	@XmlElement
-	private UUID TableID;
+	private int maxPlayers;
+	private Player[] players;
+
+	private Game currentGame;
+	private Deck currentDeck;
+	private ArrayList<Card> communityCards;
 	
-	@XmlElement
-	private HashMap<UUID, Player> HashMapPlayer = new HashMap<UUID, Player>();
+	private HashMap<Card, CardVisibility> visibility = new HashMap<Card, CardVisibility>();
+	private HashMap<Card, Player> owner = new HashMap<Card, Player>();
 	
-	public Table()
-	{
-		TableID = UUID.randomUUID();
+	private int dealerPosition;
+	private int currentPlayerPosition;
+	private int currentDeal;
+	
+	private boolean gameInProgress = false;
+
+	public Table(int maxPlayers) {
+		this.maxPlayers = maxPlayers;
+		this.players = new Player[maxPlayers];
 	}
 	
-	
-	public UUID getTableID() {
-		return TableID;
+	public Player[] getTablePlayers() {
+		return players;
 	}
 
-
-	public Table AddPlayerToTable(Player p)
-	{
-		HashMapPlayer.put(p.getPlayerID(), p);
-		return this;
-	}
-	public Table RemovePlayerFromTable(Player p)
-	{
-		HashMapPlayer.remove(p.getPlayerID());
-		return this;	
-	}
-	public HashMap getHashPlayers() {
-		return HashMapPlayer;
+	public Player getPlayerAtPosition(int position) {
+		return this.players[position];
 	}
 	
-	public Player getPlayerByPosition(int iPlayerPosition)
-	{
-		Player pl = null;
-		
-		Iterator it = getHashPlayers().entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry pair = (Map.Entry) it.next();
-			Player p = (Player)pair.getValue();
-			if (p.getiPlayerPosition() == iPlayerPosition)
-				pl = p;
-		}
-		
-		return pl;
+	public void addPlayerToTable(Player aPlayer, int position) {
+		aPlayer.setActive(!this.gameInProgress);
+		this.players[position] = aPlayer;
 	}
 	
-	public Player PickRandomPlayerAtTable()
-	{
-		List<Player> listPlayers = new ArrayList<Player>(getHashPlayers().values());
-		Collections.shuffle(listPlayers);
-		return listPlayers.get(0);
-		
-	}
-	public static Table CloneTable(Table t)
-	{
-		Table t1 = new Table();
-		t1.TableID = t.TableID;
-		Iterator it = t.getHashPlayers().entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry pair = (Map.Entry) it.next();
-			t1.AddPlayerToTable((Player)pair.getValue());
+	/**
+	 * Find the next player who has not folded, and update
+	 * currentPlayerPosition accordingly.
+	 * @return the next active player
+	 */
+	public Player nextActivePlayer() {
+		int position = 0;
+		Player aPlayer = null;
+		for (int i = 1; i <= this.maxPlayers; i++) {
+			position = (this.currentPlayerPosition + i) % this.maxPlayers;
+			aPlayer = this.getPlayerAtPosition(position);
+			if (aPlayer != null && aPlayer.isActive()) {
+				break;
+			}
 		}
-		
-		return t1;
+		this.currentPlayerPosition = position;
+		return aPlayer;
 	}
-	public static void StateOfTable(Table t)
-	{
-		System.out.println("----------------------");
-		System.out.println("Table : " + t.TableID);
-		System.out.println("Table Nbr of Players: " + t.getHashPlayers().size());
-		Iterator it = t.getHashPlayers().entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry pair = (Map.Entry) it.next();
-			Player p = (Player)pair.getValue();
-			
-			System.out.println("Player ID: " + p.getPlayerID().toString());
-			System.out.println("Player Position: " + p.getiPlayerPosition());
-			System.out.println("Player Name: " + p.getPlayerName());
-			System.out.println("----------------------");
+	
+	public boolean isCardVisibleToPlayer(Card aCard, Player aPlayer) {
+		return visibility.get(aCard) == CardVisibility.Everyone
+				|| owner.get(aCard).equals(aPlayer);
+	}
+	
+	public int winningPosition() {
+		int winIdx = -1;
+		Hand bestSoFar = Hand.WorstHand();
+		for (int i = 0; i < this.maxPlayers; i++) {
+			Player aPlayer = this.players[i];
+			if (aPlayer != null && aPlayer.isActive() 
+					&& aPlayer.getHand().compareTo(bestSoFar) > 0) {
+				bestSoFar = aPlayer.getHand();
+				winIdx = i;
+			}
 		}
-		
-		System.out.println("----------------------");
-		System.out.println(" ");
+		return winIdx;
 	}
+	
+	public void startNewGame(Game aGame, Deck aDeck, int dealerPosition) {
+		this.currentGame = aGame;
+		this.currentDeck = aDeck;
+		this.dealerPosition = dealerPosition;
+		this.currentPlayerPosition = (this.dealerPosition + 1) % this.maxPlayers;
+		for (Player aPlayer : this.players) {
+			aPlayer.reset();
+		}
+		this.currentDeal = 0;
+		this.gameInProgress = true;
+	}
+	
+	public boolean dealCards() throws DeckException {
+		if (this.currentDeal >= this.currentGame.nDeals()) {
+			this.gameInProgress = false;
+			return false;
+		}
+		ArrayList<CardDraw> draws = this.currentGame.getDeal(this.currentDeal);
+		Card aCard;
+		Player aPlayer;
+		for (CardDraw draw : draws) {
+			switch (draw.getDestination()) {
+			case Community:
+				aCard = this.currentDeck.draw();
+				this.communityCards.add(aCard);
+				this.visibility.put(aCard, draw.getVisibility());
+				break;
+			case Players:
+				for (int i = 1; i <= this.maxPlayers; i++) {
+					aPlayer = this.players[(this.dealerPosition + i) % this.maxPlayers];
+					if (aPlayer != null && aPlayer.isActive()) {
+						aCard = this.currentDeck.draw();
+						aPlayer.getHand().addCard(aCard);
+						this.visibility.put(aCard, draw.getVisibility());
+						this.owner.put(aCard, aPlayer);
+					}
+				}
+				break;
+			}
+		}
+		this.currentDeal++;
+		return true;
+	}
+	
+	public String toString() {
+		int winIdx = -1;
+		if (!this.gameInProgress) {
+			winIdx = this.winningPosition();
+		}
+		String tableStr = "Table\n";
+		if (this.communityCards.size() > 0) {
+			tableStr += "Community = ";
+			for (Card c : this.communityCards) {
+				tableStr += c + " ";
+			}
+			tableStr += "\n";
+		}
+		for (int i = 0; i < this.maxPlayers; i++) {
+			tableStr += (i == winIdx) ? "* " : " ";
+			tableStr += "Player[" + i + "] = " + this.players[i];
+		}
+		if (winIdx >= 0) {
+			tableStr += "* = winner\n";
+		}
+		return tableStr;
+	}
+	
 }

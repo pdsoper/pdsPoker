@@ -22,8 +22,8 @@ import javafx.stage.FileChooser;
 import poker.app.MainApp;
 import pokerBase.Card;
 import pokerEnums.eGame;
-import pokerEnums.eRank;
-import pokerEnums.eSuit;
+import pokerEnums.Rank;
+import pokerEnums.Suit;
 
 
 /**

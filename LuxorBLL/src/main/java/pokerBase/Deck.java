@@ -4,11 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import exceptions.DeckException;
-import pokerEnums.eDeckExceptionType;
-import pokerEnums.eHandStrength;
-import pokerEnums.eRank;
-import pokerEnums.eSuit;
+import pokerEnums.Rank;
+import pokerEnums.Suit;
+import pokerExceptions.DeckException;
 
 /**
  * 
@@ -17,86 +15,125 @@ import pokerEnums.eSuit;
  */
 public class Deck implements Serializable  {
 
-	/**
-	 * 
-	 */
-	private ArrayList<Card> deckCards = new ArrayList<Card>();
+	private ArrayList<Card> cards;
 
 	/**
-	 * No arg constructor for deck, will return shuffled deck of 52 cards
+	 * Construct a basic 52-card deck
 	 */
 	public Deck() {
-		int iCardNbr = 1;
-		for (eSuit eSuit : eSuit.values()) {
-			for (eRank eRank : eRank.values()) {
-				if ((eRank != eRank.JOKER) && (eSuit != eSuit.JOKER))
-					deckCards.add(new Card(eSuit, eRank, iCardNbr++));
+		this.cards = new ArrayList<Card>();
+		for (Suit s : Suit.values()) {
+			for (Rank r : Rank.values()) {
+				this.cards.add(new Card(r, s));
 			}
 		}
-		Collections.shuffle(deckCards);
+		Collections.shuffle(this.cards);	
 	}
-
-	public Deck(int iNbrOfJokers) {
+	
+	/**
+	 * Construct a deck with the specified number of jokers
+	 * @param nJokers
+	 */
+	public Deck(int nJokers) {
 		this();
-
-		for (int i = 0; i < iNbrOfJokers; i++) {
-			deckCards.add(new Card(eSuit.JOKER, eRank.JOKER, 53));
+		for (int i = 0; i < nJokers; i++) {
+			this.cards.add(new Joker());
 		}
-		Collections.shuffle(deckCards);
+		Collections.shuffle(this.cards);	
 	}
-
-	public Deck(int NbrOfJokers, ArrayList<Card> wilds) {
-		this(NbrOfJokers);
-
-		for (Card c : deckCards) {
-			for (Card Wild : wilds) {
-				if ((c.geteRank() == Wild.geteRank()) && (c.geteSuit() == Wild.geteSuit())) {
-					c.setWild(true);
+	
+	/**
+	 * Construct a deck in which the specified cards are wild
+	 * @param wildCards
+	 */
+	public Deck(ArrayList<WildCard> wildCards) {
+		this();
+		this.replaceWithWild(wildCards);
+		Collections.shuffle(this.cards);	
+	}
+	
+	/**
+	 * Construct a deck with the specified number of jokers, and 
+	 * in which the specified cards are wild (in addition to the jokers)
+	 * @param nJokers
+	 * @param wildCards
+	 */
+	public Deck(int nJokers, ArrayList<WildCard> wildCards) {
+		this(nJokers);
+		this.replaceWithWild(wildCards);
+		Collections.shuffle(this.cards);	
+	}
+	
+	/**
+	 * Set to wild the cards in this deck that match those in wildCards  
+	 * @param wildCards
+	 */
+	private void replaceWithWild(ArrayList<WildCard> wildCards) {
+		for (WildCard wc : wildCards) {
+			for (Card c : this.cards) {
+				if (c.isWild()) {
+					continue;
+				}
+				if (c.rankAndSuitEquals(wc)) {
+					this.cards.remove(c);
+					this.cards.add(wc);
+					break;
 				}
 			}
-
 		}
-
-		// Work to do! Make the existing Deck cards Wild...
-
+		Collections.shuffle(this.cards);
 	}
-
-	 Deck(eSuit suit) {
-		int iCardNbr = 1;
-		for (eSuit eSuit : eSuit.values()) {
-			for (eRank eRank : eRank.values()) {
-				if ((eRank != eRank.JOKER) && (eSuit != eSuit.JOKER))
-					if (suit == eSuit) {
-						deckCards.add(new Card(eSuit, eRank, iCardNbr));
-					}
-				iCardNbr++;
-			}
-		}
-		Collections.shuffle(deckCards);
-	}
-
-	ArrayList<Card> getDeckCards() {
-		return deckCards;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see pokerBase.iDeck#Draw()
+	
+	/**
+	 * Return the top card, removing it from the deck.  Throw a DeckException
+	 * if the deck runs out of cards.
+	 * @return the top card of the deck
+	 * @throws DeckException
 	 */
-	public Card Draw() throws DeckException {
-		if (deckCards.size() == 0) {
-			throw new DeckException(this, eDeckExceptionType.OverDraw);
+	public Card draw() throws DeckException {
+		if (this.cards.size() > 0) {
+			return this.cards.remove(0);
+		} else {
+			throw new DeckException();
+		} 
+	}
+	
+	/**
+	 * Return the top nCards cards from the deck.  Throw a DeckException
+	 * if the deck runs out of cards.
+	 * @param nCards
+	 * @return
+	 * @throws DeckException
+	 */
+	public ArrayList<Card> draw(int nCards) throws DeckException {
+		ArrayList<Card> cal = new ArrayList<Card>(); 
+		for (int i = 0; i < nCards; i ++) {
+			cal.add(this.draw());
 		}
-		return deckCards.remove(0);
+		return cal;
 	}
 
 	/**
-	 * Returns the number of cards left in the deck
 	 * 
-	 * @return
+	 * @return the number of cards in the deck
 	 */
-	private int GetDeckSize() {
-		return deckCards.size();
+	public int nCards() {
+		return this.cards.size();
 	}
+	
+	@Override
+	public String toString() {
+		String deckStr = "";
+		int i = 0;
+		int nRanks = Rank.values().length;
+		for (Card c : this.cards) {
+			deckStr += String.format("%3s ", c);
+			i++;
+			if (i % nRanks == 0) {
+				deckStr += "\n";
+			}
+		}
+		return deckStr;
+	}
+
 }

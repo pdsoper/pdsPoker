@@ -15,7 +15,6 @@ import javax.xml.bind.Marshaller;
 
 import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
 
-import exceptions.HandException;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.RotateTransition;
@@ -60,6 +59,7 @@ import pokerBase.Table;
 import pokerEnums.eAction;
 import pokerEnums.eGame;
 import pokerEnums.ePlayerPosition;
+import pokerExceptions.HandException;
 
 public class PokerTableController {
 

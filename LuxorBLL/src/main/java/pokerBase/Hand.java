@@ -1,726 +1,682 @@
 package pokerBase;
 
-import java.lang.reflect.Method;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.Locale;
-import java.util.UUID;
-import java.util.Vector;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import pokerEnums.HandValue;
+import pokerEnums.Rank;
+import pokerEnums.Suit;
 
-import exceptions.DeckException;
-import exceptions.HandException;
-import pokerEnums.*;
-
-import static java.lang.System.out;
-
-import java.io.Serializable;
-
-import static java.lang.System.err;
-
-@XmlRootElement
-public class Hand implements Serializable {
-
-	@XmlElement(name = "Card")
-	private ArrayList<Card> CardsInHand;
+/**
+ * @author paulsoper
+ *
+ */
+public class Hand implements Comparable<Hand>, Serializable {
 	
-	@XmlElement
-	private UUID HandID;
+	private ArrayList<Card> cards;
+	private ArrayList<Card> tieBreakers;
+	private HandValue value = null;
+	private int nWilds = 0;
 	
-	private ArrayList<Card> BestCardsInHand;
-	
-	private HandScore HandScore;
-	private boolean bScored = false;
-
-	public Hand() {
-		setHandScore(new HandScore());
-		CardsInHand = new ArrayList<Card>();
-		BestCardsInHand = new ArrayList<Card>();
-		HandID = UUID.randomUUID();
-	}
-
-	@XmlElement
-	private int getCardCount() {
-		return CardsInHand.size();
-	}
-
-	public ArrayList<Card> getCardsInHand() {
-		return CardsInHand;
-	}
-
-
-	private void setCardsInHand(ArrayList<Card> cardsInHand) {
-		CardsInHand = cardsInHand;
-	}
-
-	public ArrayList<Card> getBestCardsInHand() {
-		return BestCardsInHand;
-	}
-
-	private void setBestCardsInHand(ArrayList<Card> bestCardsInHand) {
-		BestCardsInHand = bestCardsInHand;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see pokerBase.iHandRead#getHandScore()
-	 */
-	public HandScore getHandScore() {
-		return HandScore;
-	}
-
-	private void setHandScore(HandScore handScore) {
-		HandScore = handScore;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see pokerBase.iHandRead#isbScored()
-	 */
-	@XmlElement(name = "Scored")
-	public boolean isbScored() {
-		return bScored;
-	}
-
-	private void setbScored(boolean bScored) {
-		this.bScored = bScored;
-	}
-
-	Hand AddCardToHand(Card c) {
-		CardsInHand.add(c);
-		return this;
-	}
-
-	public Hand Draw(Deck d) throws DeckException {
-		CardsInHand.add(d.Draw());
-		return this;
-	}
-
-	
-	public static Hand Evaluate(ArrayList<Hand> Hands) throws HandException
-	{
-		ArrayList<Hand> AllHands = new ArrayList<Hand>();
-		
-		for  (Hand h: Hands)
-		{
-			AllHands.add(Evaluate(h));
-		}
-		
-		//	This will sort the hands that were generated
-		Collections.sort(AllHands,Hand.HandRank);
-		
-		if (AllHands.get(0).getHandScore() == AllHands.get(1).getHandScore())
-		{
-			//	This is a tie hand (first two hand score is the same)
-			throw new HandException(AllHands.get(0),eHandExceptionType.ShortHand);
-		}
-				
-		//	This will pick the best hand (highest sort) and return it
-		return AllHands.get(0);
-		
-	}
-	
-	public static Hand Evaluate(Hand h) throws HandException
-	{		
-		ArrayList<Hand> AllHands = new ArrayList<Hand>();
-		
-		//	Make sure each hand passed in has 5 cards.  Explode is expecting 5 cards.	
-		if (h.getCardsInHand().size() != 5)
-		{
-			throw new HandException(h,eHandExceptionType.ShortHand);			
-		}
-		/* XXX It was critical to add this line, since the two special cases
-		 * assume the cards in the hand are sorted.
-		 */
-		Collections.sort(h.getCardsInHand());
-		
-		//	If the fifth card is a Joker or Wild, all five cards are jokers.  Short circuit- return 5 aces
-		if ((h.getCardsInHand().get(eCardNo.FifthCard.getCardNo()).isWild()) ||
-				(h.getCardsInHand().get(eCardNo.FifthCard.getCardNo()).geteRank() == eRank.JOKER))
-				{
-			Hand hnd = new Hand();
-			hnd.setCardsInHand(h.getCardsInHand());
-			Card ace = new Card(eSuit.HEARTS, eRank.ACE, 13);
-			for (int i = 0; i < 5; i++) {
-				hnd.BestCardsInHand.add(ace);
-			}
-			HandScore hs = new HandScore();
-			hs.setHandStrength(eHandStrength.FiveOfAKind.ordinal());
-			hs.setHiHand(eRank.ACE.ordinal());
-			hs.setLoHand(0);
-			h.setHandScore(hs);
-			return hnd;
-		}
-		
-		//	If the fourth card is a Joker or Wild, you have a five of a kind... of the fifth card
-		if ((h.getCardsInHand().get(eCardNo.FourthCard.getCardNo()).isWild()) ||
-				(h.getCardsInHand().get(eCardNo.FourthCard.getCardNo()).geteRank() == eRank.JOKER))
-				{
-			Hand hnd = new Hand();
-			hnd.setCardsInHand(h.getCardsInHand());
-			for (int i = 0; i < 5; i++) {
-				hnd.BestCardsInHand.add(h.getCardsInHand().get(eCardNo.FifthCard.getCardNo()));
-			}
-			HandScore hs = new HandScore();
-			hs.setHandStrength(eHandStrength.FiveOfAKind.ordinal());
-			hs.setHiHand(h.getCardsInHand().get(eCardNo.FifthCard.getCardNo()).geteRank().getiRankNbr());
-			hs.setLoHand(0);
-			h.setHandScore(hs);
-			return hnd;
-		}
-		
-		//	This is going to generate a number of hands if there are jokers or wilds in the hand
-		AllHands = ExplodeHands(h);
-		
-		//	This will evaluate all hands generated
-		for (Hand hand: AllHands)
-		{
-			hand = EvaluateHand(hand);
-		}
-		
-		//	This will sort the hands that were generated
-		Collections.sort(AllHands,Hand.HandRank);
-		
-		//	This will pick the best hand (highest sort) and return it
-		Hand hnd = AllHands.get(0);
-		for (int i = 0; i < 5; i++) {
-			hnd.BestCardsInHand.add(h.getCardsInHand().get(i));
-		}
-		return hnd;
-		
-	}
-	
-	/**
-	 * EvaluateHand is a static method that will score a given Hand of cards
-	 * 
-	 * @param h
-	 * @return
-	 * @throws HandException
-	 */
-	public static Hand EvaluateHand(Hand h) throws HandException {
-
-		Collections.sort(h.getCardsInHand());
-
-		if (h.getCardsInHand().size() != 5) {
-			throw new HandException(h,eHandExceptionType.ShortHand);
-		}
-		
-		HandScore hs = new HandScore();
-		try {
-			Class<?> c = Class.forName("pokerBase.Hand");
-
-			for (eHandStrength hstr : eHandStrength.values()) {
-				Class[] cArg = new Class[2];
-				cArg[0] = pokerBase.Hand.class;
-				cArg[1] = pokerBase.HandScore.class;
-
-				Method meth = c.getMethod(hstr.getEvalMethod(), cArg);
-				Object o = meth.invoke(null, new Object[] { h, hs });
-
-				// If o = true, that means the hand evaluated- skip the rest of
-				// the evaluations
-				if ((Boolean) o) {
-					break;
-				}
-			}
-
-			h.bScored = true;
-			h.HandScore = hs;
-
-		} catch (ClassNotFoundException x) {
-			x.printStackTrace();
-		} catch (IllegalAccessException x) {
-			x.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		}
+	static Hand WorstHand() {
+		Hand h = new Hand();
+		h.addCard(new Card (Rank.TWO, Suit.CLUBS));
+		h.addCard(new Card (Rank.THREE, Suit.DIAMONDS));
+		h.addCard(new Card (Rank.FOUR, Suit.HEARTS));
+		h.addCard(new Card (Rank.FIVE, Suit.SPADES));
+		h.addCard(new Card (Rank.SEVEN, Suit.CLUBS));
 		return h;
 	}
-
-	static ArrayList<Hand> ExplodeHands(Hand h) {
-		ArrayList<Hand> HandsToReturn = new ArrayList<Hand>();
-		
-		HandsToReturn.add(h);
-
-		// Create 13 card deck by suit
-		Deck dSuit = new Deck(h.CardsInHand.get(eCardNo.FifthCard.getCardNo()).geteSuit());
-		
-		//	Call the method that will substitute each card if it's a joker
-		for (int a = 0; a < h.CardsInHand.size(); a++)
-		{
-			HandsToReturn = SubstituteHand(HandsToReturn, a, dSuit);
-		}
-		return HandsToReturn;
+	
+	public Hand() {
+		this.cards = new ArrayList<Card>();
+		this.tieBreakers = new ArrayList<Card>();
 	}
-
-	private static ArrayList<Hand> SubstituteHand(ArrayList<Hand> inHands, int SubCardNo, Deck dSuit) {
-
-		ArrayList<Hand> SubHands = new ArrayList<Hand>();
-
-		for (Hand h : inHands) {
-			ArrayList<Card> c = h.getCardsInHand();
-			if (c.get(SubCardNo).geteRank() == eRank.JOKER || c.get(SubCardNo).isWild()) {
-
-				for (Card JokerSub : dSuit.getDeckCards()) {
-					ArrayList<Card> SubCards = new ArrayList<Card>();
-					SubCards.add(JokerSub);
-					for (int a = 0; a < 5; a++) {
-						if (SubCardNo != a) {
-							SubCards.add(h.getCardsInHand().get(a));
-						}
-					}
-					Hand sub = new Hand();
-					for (Card subCard : SubCards) {
-						sub.AddCardToHand(subCard);
-					}					
-					sub.getHandScore().setNatural(false);
-					SubHands.add(sub);
-				}
-			} else {
-				SubHands.add(h);
-			}
-		}
-		return SubHands;
+	
+	public Hand(Hand original) {
+		this();
+		this.setTo(original);
 	}
-
-	private static boolean isHandFlush(ArrayList<Card> cards) {
-		int cnt = 0;
-		boolean bIsFlush = false;
-		for (eSuit Suit : eSuit.values()) {
-			cnt = 0;
-			for (Card c : cards) {
-				if (c.geteSuit() == Suit) {
-					cnt++;
-				}
-			}
-			if (cnt == 5)
-				bIsFlush = true;
-
-		}
-		return bIsFlush;
-	}
-
-	private static boolean isStraight(ArrayList<Card> cards, Card highCard) {
-		boolean bIsStraight = false;
-		boolean bAce = false;
-
-		int iStartCard = 0;
-		highCard.seteRank(cards.get(eCardNo.FirstCard.getCardNo()).geteRank());
-		highCard.seteSuit(cards.get(eCardNo.FirstCard.getCardNo()).geteSuit());
-
-		if (cards.get(eCardNo.FirstCard.getCardNo()).geteRank() == eRank.ACE) {
-			// First card is an 'ace', handle aces
-			bAce = true;
-			iStartCard++;
-		}
-
-		for (int a = iStartCard; a < cards.size() - 1; a++) {
-			if ((cards.get(a).geteRank().getiRankNbr() - cards.get(a + 1).geteRank().getiRankNbr()) == 1) {
-				bIsStraight = true;
-			} else {
-				bIsStraight = false;
-				break;
-			}
-		}
-
-		if ((bAce) && (bIsStraight)) {
-			if (cards.get(eCardNo.SecondCard.getCardNo()).geteRank() == eRank.KING) {
-				highCard.seteRank(cards.get(eCardNo.FirstCard.getCardNo()).geteRank());
-				highCard.seteSuit(cards.get(eCardNo.FirstCard.getCardNo()).geteSuit());
-			} else if (cards.get(eCardNo.SecondCard.getCardNo()).geteRank() == eRank.FIVE) {
-				highCard.seteRank(cards.get(eCardNo.SecondCard.getCardNo()).geteRank());
-				highCard.seteSuit(cards.get(eCardNo.SecondCard.getCardNo()).geteSuit());
-			} else {
-				bIsStraight = false;
-			}
-		}
-		return bIsStraight;
-	}
-
-	public static boolean isHandFiveOfAKind(Hand h, HandScore hs) {
-
-		int iCnt = 0;
-		boolean isFive = false;
-
-		for (eRank Rank : eRank.values()) {
-			iCnt = 0;
-			for (Card c : h.getCardsInHand()) {
-				if (c.geteRank() == Rank) {
-					iCnt++;
-				}
-			}
-			if (iCnt == 5) {
-				isFive = true;
-				break;
-			}
-		}
-
-		if (isFive) {
-			hs.setHandStrength(eHandStrength.FiveOfAKind.getHandStrength());
-			hs.setHiHand(h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()).geteRank().getiRankNbr());
-			hs.setLoHand(0);
-		}
-		return isFive;
-	}
-
-	public static boolean isHandRoyalFlush(Hand h, HandScore hs) {
-
-		Card c = new Card();
-		boolean isRoyalFlush = false;
-		if ((isHandFlush(h.getCardsInHand())) && (isStraight(h.getCardsInHand(), c))) {
-			if (c.geteRank() == eRank.ACE) {
-				isRoyalFlush = true;
-				hs.setHandStrength(eHandStrength.RoyalFlush.getHandStrength());
-				hs.setHiHand(h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()).geteRank().getiRankNbr());
-				hs.setLoHand(0);
-			}
-
-		}
-
-		return isRoyalFlush;
+	
+	/**
+	 * Create a hand consisting of the five specified cards
+	 * @param c1 card 1
+	 * @param c2 card 2
+	 * @param c3 card 3
+	 * @param c4 card 4
+	 * @param c5 card 5
+	 */
+	public Hand(Card c1, Card c2, Card c3, Card c4, Card c5) {
+		this();
+		this.addCard(c1);
+		this.addCard(c2);
+		this.addCard(c3);
+		this.addCard(c4);
+		this.addCard(c5);
 	}
 
 	/**
-	 * isHandStraightFlush - Will return true if the hand is a straight flush
-	 * @param h
-	 * @param hs
-	 * @return
+	 * Set the attributes of this hand to those of the argument
+	 * @param aHand
 	 */
-	public static boolean isHandStraightFlush(Hand h, HandScore hs) {
-		Card c = new Card();
-		boolean isRoyalFlush = false;
-		if ((isHandFlush(h.getCardsInHand())) && (isStraight(h.getCardsInHand(), c))) {
-			isRoyalFlush = true;
-			hs.setHandStrength(eHandStrength.StraightFlush.getHandStrength());
-			hs.setHiHand(c.geteRank().getiRankNbr());
-			hs.setLoHand(0);
+	public void setTo(Hand aHand) {
+		this.resetHand();
+		for (Card c : aHand.cards) {
+			if (c instanceof Joker) {
+				this.addCard(new Joker((Joker) c));
+			} else if (c instanceof WildCard) {
+				this.addCard(new WildCard((WildCard) c)); 
+			} else {
+				this.cards.add(new Card(c));
+			}
 		}
-
-		return isRoyalFlush;
+		for (Card c: aHand.tieBreakers) {
+			 if (c instanceof Joker) {
+				 this.tieBreakers.add(new Joker((Joker) c));
+			} else if (c instanceof WildCard) {
+				this.tieBreakers.add(new WildCard((WildCard) c)); 
+			} else {
+				this.tieBreakers.add(new Card(c));
+			}
+		}
+		this.value = aHand.value;
+	}
+	
+	/**
+	 * Reset all variables of this hand to their initial default values
+	 */
+	public void resetHand() {
+		this.cards.clear();
+		this.tieBreakers.clear();
+		this.nWilds = 0;
+		this.value = null;
 	}
 
-	public static boolean isHandFourOfAKind(Hand h, HandScore hs) {
-
-		boolean bHandCheck = false;
-
-		if (h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()).geteRank() == h.getCardsInHand()
-				.get(eCardNo.FourthCard.getCardNo()).geteRank()) {
-			bHandCheck = true;
-			hs.setHandStrength(eHandStrength.FourOfAKind.getHandStrength());
-			hs.setHiHand(h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()).geteRank().getiRankNbr());
-			hs.setLoHand(0);
-			ArrayList<Card> kickers = new ArrayList<Card>();
-			kickers.add(h.getCardsInHand().get(eCardNo.FifthCard.getCardNo()));
-			hs.setKickers(kickers);
-
-		} else if (h.getCardsInHand().get(eCardNo.SecondCard.getCardNo()).geteRank() == h.getCardsInHand()
-				.get(eCardNo.FifthCard.getCardNo()).geteRank()) {
-			bHandCheck = true;
-			hs.setHandStrength(eHandStrength.FourOfAKind.getHandStrength());
-			hs.setHiHand(h.getCardsInHand().get(eCardNo.SecondCard.getCardNo()).geteRank().getiRankNbr());
-			hs.setLoHand(0);
-			ArrayList<Card> kickers = new ArrayList<Card>();
-			kickers.add(h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()));
-			hs.setKickers(kickers);
+	/**
+	 * add specified card to this hand
+	 * @param c The card to be added
+	 */
+	public void addCard(Card c){
+		this.cards.add(c);
+		if (c instanceof WildCard) {
+			this.nWilds++;
 		}
-
-		return bHandCheck;
 	}
 
-	public static boolean isHandFullHouse(Hand h, HandScore hs) {
-
-		boolean isFullHouse = false;
-		ArrayList<Card> kickers = new ArrayList<Card>();
-		if ((h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()).geteRank() == h.getCardsInHand()
-				.get(eCardNo.ThirdCard.getCardNo()).geteRank())
-				&& (h.getCardsInHand().get(eCardNo.FourthCard.getCardNo()).geteRank() == h.getCardsInHand()
-						.get(eCardNo.FifthCard.getCardNo()).geteRank())) {
-			isFullHouse = true;
-			hs.setHandStrength(eHandStrength.FullHouse.getHandStrength());
-			hs.setHiHand(h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()).geteRank().getiRankNbr());
-			hs.setLoHand(h.getCardsInHand().get(eCardNo.FourthCard.getCardNo()).geteRank().getiRankNbr());
-		} else if ((h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()).geteRank() == h.getCardsInHand()
-				.get(eCardNo.SecondCard.getCardNo()).geteRank())
-				&& (h.getCardsInHand().get(eCardNo.ThirdCard.getCardNo()).geteRank() == h.getCardsInHand()
-						.get(eCardNo.FifthCard.getCardNo()).geteRank())) {
-			isFullHouse = true;
-			hs.setHandStrength(eHandStrength.FullHouse.getHandStrength());
-			hs.setHiHand(h.getCardsInHand().get(eCardNo.ThirdCard.getCardNo()).geteRank().getiRankNbr());
-			hs.setLoHand(h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()).geteRank().getiRankNbr());
-		}
-
-		return isFullHouse;
-
+	/**
+	 * Number of cards in this hand
+	 * @return the number of cards in this hand
+	 */
+	public int nCards() {
+		return this.cards.size();
 	}
 
-	public static boolean isHandFlush(Hand h, HandScore hs) {
-
-		boolean bIsFlush = false;
-		if (isHandFlush(h.getCardsInHand())) {
-			hs.setHandStrength(eHandStrength.Flush.getHandStrength());
-			hs.setHiHand(h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()).geteRank().getiRankNbr());
-			hs.setLoHand(0);
-			ArrayList<Card> kickers = new ArrayList<Card>();
-			kickers.add(h.getCardsInHand().get(eCardNo.SecondCard.getCardNo()));
-			kickers.add(h.getCardsInHand().get(eCardNo.ThirdCard.getCardNo()));
-			kickers.add(h.getCardsInHand().get(eCardNo.FourthCard.getCardNo()));
-			kickers.add(h.getCardsInHand().get(eCardNo.FifthCard.getCardNo()));
-			hs.setKickers(kickers);
-			bIsFlush = true;
+	/**
+	 * Return the value of this hand (no pair, one pair, etc.).  
+	 * @return the value of this hand
+	 */
+	public HandValue getValue() {
+		if (this.value == null) {
+			this.evaluate();
 		}
-
-		return bIsFlush;
+		return this.value;
 	}
 
-	public static boolean isHandStraight(Hand h, HandScore hs) {
-
-		boolean bIsStraight = false;
-		Card highCard = new Card();
-		if (isStraight(h.getCardsInHand(), highCard)) {
-			hs.setHandStrength(eHandStrength.Straight.getHandStrength());
-			hs.setHiHand(highCard.geteRank().getiRankNbr());
-			hs.setLoHand(0);
-			bIsStraight = true;
-		}
-		return bIsStraight;
+	/**
+	 * Return the tie breakers for this hand
+	 * @return the ArrayList of Cards used to break ties
+	 */
+	public ArrayList<Card> getTiebreakers() {
+		return this.tieBreakers;
 	}
-
-	public static boolean isHandThreeOfAKind(Hand h, HandScore hs) {
-
-		boolean isThreeOfAKind = false;
-		ArrayList<Card> kickers = new ArrayList<Card>();
-		if (h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()).geteRank() == h.getCardsInHand()
-				.get(eCardNo.ThirdCard.getCardNo()).geteRank()) {
-			isThreeOfAKind = true;
-			hs.setHiHand(h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()).geteRank().getiRankNbr());
-			kickers.add(h.getCardsInHand().get(eCardNo.FourthCard.getCardNo()));
-			kickers.add(h.getCardsInHand().get(eCardNo.FifthCard.getCardNo()));
-		} else if (h.getCardsInHand().get(eCardNo.SecondCard.getCardNo()).geteRank() == h.getCardsInHand()
-				.get(eCardNo.FourthCard.getCardNo()).geteRank()) {
-			isThreeOfAKind = true;
-			hs.setHiHand(h.getCardsInHand().get(eCardNo.SecondCard.getCardNo()).geteRank().getiRankNbr());
-			kickers.add(h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()));
-			kickers.add(h.getCardsInHand().get(eCardNo.FifthCard.getCardNo()));
-
-		} else if (h.getCardsInHand().get(eCardNo.ThirdCard.getCardNo()).geteRank() == h.getCardsInHand()
-				.get(eCardNo.FifthCard.getCardNo()).geteRank()) {
-			isThreeOfAKind = true;
-			hs.setHiHand(h.getCardsInHand().get(eCardNo.ThirdCard.getCardNo()).geteRank().getiRankNbr());
-			kickers.add(h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()));
-			kickers.add(h.getCardsInHand().get(eCardNo.SecondCard.getCardNo()));
-
+	
+	public boolean evaluateWild() {
+		switch (this.nWilds) {
+		case 0:
+			return this.evaluateWithCurrentRanks();
+		case 1:
+			return this.evaluateOneWild();
+		case 2:
+			return this.evaluateTwoWild();
+		case 3:
+			return this.evaluateThreeWild();
+		case 4:
+			return this.makeFourWild();
+		case 5:
+			return this.makeFiveWild();
+		default:
+			return false;
 		}
-
-		if (isThreeOfAKind) {
-			hs.setHandStrength(eHandStrength.ThreeOfAKind.getHandStrength());
-			hs.setLoHand(0);
-			hs.setKickers(kickers);
-		}
-
-		return isThreeOfAKind;
 	}
-
-	public static boolean isHandTwoPair(Hand h, HandScore hs) {
-
-		boolean isTwoPair = false;
-		ArrayList<Card> kickers = new ArrayList<Card>();
-		if ((h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()).geteRank() == h.getCardsInHand()
-				.get(eCardNo.SecondCard.getCardNo()).geteRank())
-				&& (h.getCardsInHand().get(eCardNo.ThirdCard.getCardNo()).geteRank() == h.getCardsInHand()
-						.get(eCardNo.FourthCard.getCardNo()).geteRank())) {
-			isTwoPair = true;
-			hs.setHandStrength(eHandStrength.TwoPair.getHandStrength());
-			hs.setHiHand(h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()).geteRank().getiRankNbr());
-			hs.setLoHand(h.getCardsInHand().get(eCardNo.ThirdCard.getCardNo()).geteRank().getiRankNbr());
-			kickers.add(h.getCardsInHand().get((eCardNo.FifthCard.getCardNo())));
-			hs.setKickers(kickers);
-		} else if ((h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()).geteRank() == h.getCardsInHand()
-				.get(eCardNo.SecondCard.getCardNo()).geteRank())
-				&& (h.getCardsInHand().get(eCardNo.FourthCard.getCardNo()).geteRank() == h.getCardsInHand()
-						.get(eCardNo.FifthCard.getCardNo()).geteRank())) {
-			isTwoPair = true;
-			hs.setHandStrength(eHandStrength.TwoPair.getHandStrength());
-			hs.setHiHand(h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()).geteRank().getiRankNbr());
-			hs.setLoHand(h.getCardsInHand().get(eCardNo.FourthCard.getCardNo()).geteRank().getiRankNbr());
-			kickers.add(h.getCardsInHand().get((eCardNo.ThirdCard.getCardNo())));
-			hs.setKickers(kickers);
-		} else if ((h.getCardsInHand().get(eCardNo.SecondCard.getCardNo()).geteRank() == h.getCardsInHand()
-				.get(eCardNo.ThirdCard.getCardNo()).geteRank())
-				&& (h.getCardsInHand().get(eCardNo.FourthCard.getCardNo()).geteRank() == h.getCardsInHand()
-						.get(eCardNo.FifthCard.getCardNo()).geteRank())) {
-			isTwoPair = true;
-			hs.setHandStrength(eHandStrength.TwoPair.getHandStrength());
-			hs.setHiHand(h.getCardsInHand().get(eCardNo.SecondCard.getCardNo()).geteRank().getiRankNbr());
-			hs.setLoHand(h.getCardsInHand().get(eCardNo.FourthCard.getCardNo()).geteRank().getiRankNbr());
-			kickers.add(h.getCardsInHand().get((eCardNo.FirstCard.getCardNo())));
-			hs.setKickers(kickers);
+	
+	public boolean makeFiveWild() {
+		Collections.sort(this.cards, new CardWildFirstComparator());
+		for (Card c : this.cards) {
+			WildCard wc = (WildCard) c;
+			wc.setRank(Rank.ACE);
+			wc.setSuit(Suit.SPADES);
 		}
-		return isTwoPair;
-	}
-
-	public static boolean isHandPair(Hand h, HandScore hs) {
-		boolean isPair = false;
-		ArrayList<Card> kickers = new ArrayList<Card>();
-		if (h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()).geteRank() == h.getCardsInHand()
-				.get(eCardNo.SecondCard.getCardNo()).geteRank()) {
-			isPair = true;
-			hs.setHandStrength(eHandStrength.Pair.getHandStrength());
-			hs.setHiHand(h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()).geteRank().getiRankNbr());
-			hs.setLoHand(0);
-			kickers.add(h.getCardsInHand().get((eCardNo.ThirdCard.getCardNo())));
-			kickers.add(h.getCardsInHand().get((eCardNo.FourthCard.getCardNo())));
-			kickers.add(h.getCardsInHand().get((eCardNo.FifthCard.getCardNo())));
-			hs.setKickers(kickers);
-		} else if (h.getCardsInHand().get(eCardNo.SecondCard.getCardNo()).geteRank() == h.getCardsInHand()
-				.get(eCardNo.ThirdCard.getCardNo()).geteRank()) {
-			isPair = true;
-			hs.setHandStrength(eHandStrength.Pair.getHandStrength());
-			hs.setHiHand(h.getCardsInHand().get(eCardNo.SecondCard.getCardNo()).geteRank().getiRankNbr());
-			hs.setLoHand(0);
-			kickers.add(h.getCardsInHand().get((eCardNo.FirstCard.getCardNo())));
-			kickers.add(h.getCardsInHand().get((eCardNo.FourthCard.getCardNo())));
-			kickers.add(h.getCardsInHand().get((eCardNo.FifthCard.getCardNo())));
-			hs.setKickers(kickers);
-		} else if (h.getCardsInHand().get(eCardNo.ThirdCard.getCardNo()).geteRank() == h.getCardsInHand()
-				.get(eCardNo.FourthCard.getCardNo()).geteRank()) {
-			isPair = true;
-			hs.setHandStrength(eHandStrength.Pair.getHandStrength());
-			hs.setHiHand(h.getCardsInHand().get(eCardNo.ThirdCard.getCardNo()).geteRank().getiRankNbr());
-			hs.setLoHand(0);
-			kickers.add(h.getCardsInHand().get((eCardNo.FirstCard.getCardNo())));
-			kickers.add(h.getCardsInHand().get((eCardNo.SecondCard.getCardNo())));
-			kickers.add(h.getCardsInHand().get((eCardNo.FifthCard.getCardNo())));
-			hs.setKickers(kickers);
-		} else if (h.getCardsInHand().get(eCardNo.FourthCard.getCardNo()).geteRank() == h.getCardsInHand()
-				.get(eCardNo.FifthCard.getCardNo()).geteRank()) {
-			isPair = true;
-			hs.setHandStrength(eHandStrength.Pair.getHandStrength());
-			hs.setHiHand(h.getCardsInHand().get(eCardNo.FourthCard.getCardNo()).geteRank().getiRankNbr());
-			hs.setLoHand(0);
-			kickers.add(h.getCardsInHand().get((eCardNo.FirstCard.getCardNo())));
-			kickers.add(h.getCardsInHand().get((eCardNo.SecondCard.getCardNo())));
-			kickers.add(h.getCardsInHand().get((eCardNo.ThirdCard.getCardNo())));
-			hs.setKickers(kickers);
-		}
-		return isPair;
-	}
-
-	public static boolean isHandHighCard(Hand h, HandScore hs) {
-		hs.setHandStrength(eHandStrength.HighCard.getHandStrength());
-		hs.setHiHand(h.getCardsInHand().get(eCardNo.FirstCard.getCardNo()).geteRank().getiRankNbr());
-		hs.setLoHand(0);
-		ArrayList<Card> kickers = new ArrayList<Card>();
-		kickers.add(h.getCardsInHand().get(eCardNo.SecondCard.getCardNo()));
-		kickers.add(h.getCardsInHand().get(eCardNo.ThirdCard.getCardNo()));
-		kickers.add(h.getCardsInHand().get(eCardNo.FourthCard.getCardNo()));
-		kickers.add(h.getCardsInHand().get(eCardNo.FifthCard.getCardNo()));
-		hs.setKickers(kickers);
+		this.value = HandValue.FIVE_OF_A_KIND;
+		this.tieBreakers.clear();
+		this.tieBreakers.add(this.cards.get(0));
 		return true;
 	}
 
-	public static Comparator<Hand> HandRank = new Comparator<Hand>() {
-
-		public int compare(Hand h1, Hand h2) {
-
-			int result = 0;
-
-			result = h2.getHandScore().getHandStrength() - h1.getHandScore().getHandStrength();
-
-			if (result != 0) {
-				return result;
+	public boolean makeFourWild() {
+		Collections.sort(this.cards, new CardWildFirstComparator());
+		Rank r = this.cards.get(4).getRank();
+		Suit s = this.cards.get(4).getSuit();
+		for (int i = 0; i < 4; i++) {
+			WildCard wc = (WildCard) this.cards.get(i);
+			wc.setRank(r);
+			wc.setSuit(s);
+		}
+		this.value = HandValue.FIVE_OF_A_KIND;
+		this.tieBreakers.clear();
+		this.tieBreakers.add(this.cards.get(4));
+		return true; 
+	}
+	
+	public boolean evaluateOneWild() {
+		Collections.sort(this.cards, new CardWildFirstComparator());
+		Hand bestSoFar = WorstHand();
+		Suit s = this.cards.get(4).getSuit();
+		WildCard wc1 = (WildCard) this.cards.get(0);
+		wc1.setSuit(s);
+		for (Rank r : Rank.values()) {
+			wc1.setRank(r);
+			this.evaluateWithCurrentRanks();
+			if (this.compareTo(bestSoFar) > 0) {
+				bestSoFar = new Hand(this);
 			}
-
-			result = h2.getHandScore().getHiHand() - h1.getHandScore().getHiHand();
-			if (result != 0) {
-				return result;
-			}
-
-			result = h2.getHandScore().getLoHand() - h1.getHandScore().getLoHand();
-			if (result != 0) {
-				return result;
-			}
-
-			if (h2.getHandScore().getKickers().size() > 0) {
-				if (h1.getHandScore().getKickers().size() > 0) {
-					result = h2.getHandScore().getKickers().get(eCardNo.FirstCard.getCardNo()).geteRank().getiRankNbr()
-							- h1.getHandScore().getKickers().get(eCardNo.FirstCard.getCardNo()).geteRank()
-									.getiRankNbr();
-				}
-				if (result != 0) {
-					return result;
-				}
-			}
-
-			if (h2.getHandScore().getKickers().size() > 1) {
-				if (h1.getHandScore().getKickers().size() > 1) {
-					result = h2.getHandScore().getKickers().get(eCardNo.SecondCard.getCardNo()).geteRank().getiRankNbr()
-							- h1.getHandScore().getKickers().get(eCardNo.SecondCard.getCardNo()).geteRank()
-									.getiRankNbr();
-				}
-				if (result != 0) {
-					return result;
-				}
-			}
-
-			if (h2.getHandScore().getKickers().size() > 2) {
-				if (h1.getHandScore().getKickers().size() > 2) {
-					result = h2.getHandScore().getKickers().get(eCardNo.ThirdCard.getCardNo()).geteRank().getiRankNbr()
-							- h1.getHandScore().getKickers().get(eCardNo.ThirdCard.getCardNo()).geteRank()
-									.getiRankNbr();
-				}
-				if (result != 0) {
-					return result;
+		}
+		this.setTo(bestSoFar);
+		return true;
+	}
+	
+	public boolean evaluateTwoWild() {
+		Collections.sort(this.cards, new CardWildFirstComparator());
+		Hand bestSoFar = WorstHand();
+		Suit s = this.cards.get(4).getSuit();
+		WildCard wc1 = (WildCard) this.cards.get(0);
+		WildCard wc2 = (WildCard) this.cards.get(0);
+		wc1.setSuit(s);
+		wc2.setSuit(s);
+		for (Rank r1 : Rank.values()) {
+			for (Rank r2 : Rank.values()) {
+				wc1.setRank(r1);
+				wc2.setRank(r2);
+				this.evaluateWithCurrentRanks();
+				if (this.compareTo(bestSoFar) > 0) {
+					bestSoFar = new Hand(this);
 				}
 			}
-
-			if (h2.getHandScore().getKickers().size() > 3) {
-				if (h1.getHandScore().getKickers().size() > 3) {
-					result = h2.getHandScore().getKickers().get(eCardNo.FourthCard.getCardNo()).geteRank().getiRankNbr()
-							- h1.getHandScore().getKickers().get(eCardNo.FourthCard.getCardNo()).geteRank()
-									.getiRankNbr();
+		}
+		this.setTo(bestSoFar);
+		return true;
+	}
+	
+	public boolean evaluateThreeWild() {
+		Collections.sort(this.cards, new CardWildFirstComparator());
+		Hand bestSoFar = WorstHand();
+		Suit s = this.cards.get(4).getSuit();
+		WildCard wc1 = (WildCard) this.cards.get(0);
+		WildCard wc2 = (WildCard) this.cards.get(1);
+		WildCard wc3 = (WildCard) this.cards.get(2);
+		wc1.setSuit(s);
+		wc2.setSuit(s);
+		wc3.setSuit(s);
+		for (Rank r1 : Rank.values()) {
+			for (Rank r2 : Rank.values()) {
+				for (Rank r3 : Rank.values()) {
+					wc1.setRank(r1);
+					wc2.setRank(r2);
+					wc3.setRank(r3);
+					this.evaluateWithCurrentRanks();
+					if (this.compareTo(bestSoFar) > 0) {
+						bestSoFar = new Hand(this);
+					}
 				}
-				if (result != 0) {
-					return result;
+			}
+		}
+		this.setTo(bestSoFar);
+		return true;
+	}	
+	
+	/**
+	 * Evaluate this hand. Store the value and tie breakers
+	 * @return true
+	 */
+	public boolean evaluate() {
+		if (this.nCards() != 5) {
+			return false;
+		}  
+		if (this.nWilds == 0) {
+			return this.evaluateWithCurrentRanks();
+		} else {
+			return this.evaluateWild();
+		}
+	}
+
+	/**
+	 * Evaluate this hand. Store the value and tie breakers
+	 * @return true
+	 */
+	public boolean evaluateWithCurrentRanks() {
+		Collections.sort(this.cards);
+		return     this.isFiveOfaKind()
+				|| this.isRoyalFlush()
+				|| this.isStraightFlush()
+				|| this.isFourOfaKind()
+				|| this.isFullHouse()
+				|| this.isFlush()
+				|| this.isStraight()
+				|| this.isThreeOfaKind()
+				|| this.isTwoPair()
+				|| this.isOnePair()
+				|| this.isNoPair();
+	}
+	
+	/**
+	 * Determine whether this hand is five of a kind
+	 * @return true if this hand is five of a kind
+	 */
+	public boolean isFiveOfaKind() {
+		if (this.cards.get(0).rankEquals(this.cards.get(4))) {
+			this.value = HandValue.FIVE_OF_A_KIND;	
+			this.tieBreakers.clear();
+			this.tieBreakers.add(this.cards.get(0));
+			return true; 
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Determine whether this hand is a royal flush,
+	 * assuming it does not have a higher value
+	 * @return true if this hand is royal flush
+	 */
+	public boolean isRoyalFlush() {
+		if (   this.isStraightFlush() 
+			&& this.cards.get(0).getRank() == Rank.ACE) {
+			this.value = HandValue.ROYAL_FLUSH;
+			this.tieBreakers.clear();
+			this.tieBreakers.add(this.cards.get(0));
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Determine whether this hand is a straight flush,
+	 * assuming it does not have a higher value
+	 * @return true if this hand is a straight flush
+	 */
+	public boolean isStraightFlush() {
+		if (this.isFlush() && this.isStraight()) {
+			this.value = HandValue.STRAIGHT_FLUSH;
+			this.tieBreakers.clear();
+			this.tieBreakers.add(this.cards.get(0));
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Determine whether this hand is four of a kind,
+	 * assuming it does not have a higher value
+	 * @return true if this hand is four of a kind
+	 */
+	public boolean isFourOfaKind() {
+		if (   (this.cards.get(0).rankEquals(this.cards.get(3)))
+		    || (this.cards.get(1).rankEquals(this.cards.get(4)))) {
+			this.value = HandValue.FOUR_OF_A_KIND;
+			this.tieBreakers.clear();
+			this.tieBreakers.add(this.cards.get(1));
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Determine whether this hand is a full house
+	 * assuming it does not have a higher value
+	 * @return true if this hand is full house
+	 */
+	public boolean isFullHouse() {
+		if (   (this.cards.get(0).rankEquals(this.cards.get(2)))	
+	    	&& (this.cards.get(3).rankEquals(this.cards.get(4)))) {
+			this.value = HandValue.FULL_HOUSE;
+			this.tieBreakers.clear();
+			this.tieBreakers.add(this.cards.get(0));
+			this.tieBreakers.add(this.cards.get(4));
+			return true;
+		} else if ( (this.cards.get(0).rankEquals(this.cards.get(1)))	
+				 && (this.cards.get(2).rankEquals(this.cards.get(4)))) {
+			this.value = HandValue.FULL_HOUSE;
+			this.tieBreakers.clear();
+			this.tieBreakers.add(this.cards.get(4));
+			this.tieBreakers.add(this.cards.get(0));
+			return true;
+		} else
+			return false;
+	}
+
+	/**
+	 * Determine whether this hand is a flush,
+	 * assuming it does not have a higher value
+	 * @return true if this hand is flush
+	 */
+	public boolean isFlush() {
+		if (   this.cards.get(1).suitEquals(this.cards.get(0))
+			&& this.cards.get(2).suitEquals(this.cards.get(0))
+			&& this.cards.get(3).suitEquals(this.cards.get(0))
+			&& this.cards.get(4).suitEquals(this.cards.get(0))) {
+			this.value = HandValue.FLUSH;
+			this.tieBreakers.clear();
+			for (Card c : this.cards) {
+				this.tieBreakers.add(c);
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Determine whether this hand is a straight,
+	 * assuming it does not have a higher value
+	 * @return true if this hand is a straight
+	 */
+	public boolean isStraight() {
+		if (   this.cards.get(1).isOneRankHigherThan(this.cards.get(2))
+			&& this.cards.get(2).isOneRankHigherThan(this.cards.get(3))
+			&& this.cards.get(3).isOneRankHigherThan(this.cards.get(4))) {
+			if (this.cards.get(0).isOneRankHigherThan(this.cards.get(1))) {
+				this.value = HandValue.STRAIGHT;
+				this.tieBreakers.clear();
+				this.tieBreakers.add(this.cards.get(0));
+				return true;
+	 		} else if (this.cards.get(0).getRank() == Rank.ACE && this.cards.get(4).getRank() == Rank.TWO) {
+				this.value = HandValue.STRAIGHT;
+				this.tieBreakers.clear();
+				this.tieBreakers.add(this.cards.get(1));
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Determine whether this hand is three of a kind,
+	 * assuming it does not have a higher value
+	 * @return true if this hand is three of a kind
+	 */
+	public boolean isThreeOfaKind() {
+		return     this.isTopThreeOfaKind()
+				|| this.isMiddleThreeOfaKind()
+				|| this.isBottomThreeOfaKind();
+	}
+	
+	/**
+	 * Test for three of a kind in the highest three cards
+	 * @return true if the highest three cards in the hand form three of a kind
+	 */
+	public boolean isTopThreeOfaKind() {
+		if (this.cards.get(0).rankEquals(this.cards.get(2))) {
+			this.value = HandValue.THREE_OF_A_KIND;
+			this.tieBreakers.clear();
+			this.tieBreakers.add(this.cards.get(0));
+			this.tieBreakers.add(this.cards.get(3));
+			this.tieBreakers.add(this.cards.get(4));
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Test for three of a kind in the middle three cards
+	 * @return true if the middle three cards in the hand form three of a kind
+	 */
+	public boolean isMiddleThreeOfaKind() {
+		if (this.cards.get(1).rankEquals(this.cards.get(3))) {
+			this.value = HandValue.THREE_OF_A_KIND;
+			this.tieBreakers.clear();
+			this.tieBreakers.add(this.cards.get(1));
+			this.tieBreakers.add(this.cards.get(0));
+			this.tieBreakers.add(this.cards.get(4));
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Test for three of a kind in the lowest three cards
+	 * @return true if the lowest three cards in the hand form three of a kind
+	 */
+	public boolean isBottomThreeOfaKind() {
+		if (this.cards.get(2).rankEquals(this.cards.get(4))) {
+			this.value = HandValue.THREE_OF_A_KIND;
+			this.tieBreakers.clear();
+			this.tieBreakers.add(this.cards.get(2));
+			this.tieBreakers.add(this.cards.get(0));
+			this.tieBreakers.add(this.cards.get(1));
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Determine whether this hand is two pair
+	 * assuming it does not have a higher value
+	 * @return true if this hand is two pair
+	 */
+	public boolean isTwoPair() {
+		return     this.isHighTwoPair() 
+				|| this.isMiddleTwoPair() 
+				|| this.isLowTwoPair();
+	}
+
+	/**
+	 * Test for two pair in the top four cards
+	 * @return true if the highest four cards in the hand form two pair
+	 */
+	public boolean isHighTwoPair() {
+		if (   this.cards.get(0).rankEquals(this.cards.get(1)) 
+		    && this.cards.get(2).rankEquals(this.cards.get(3))) {
+			this.value = HandValue.TWO_PAIR;
+			this.tieBreakers.clear();
+			this.tieBreakers.add(this.cards.get(0));
+			this.tieBreakers.add(this.cards.get(2));
+			this.tieBreakers.add(this.cards.get(4));
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Test for two pair in the top two and bottom two cards
+	 * @return true if the top two and bottom two cards in the hand form two pair
+	 */
+	public boolean isMiddleTwoPair() {
+		if (   this.cards.get(0).rankEquals(this.cards.get(1)) 
+		    && this.cards.get(3).rankEquals(this.cards.get(4))) {
+			this.value = HandValue.TWO_PAIR;
+			this.tieBreakers.clear();
+			this.tieBreakers.add(this.cards.get(0));
+			this.tieBreakers.add(this.cards.get(3));
+			this.tieBreakers.add(this.cards.get(2));
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Test for two pair in the bottom four cards
+	 * @return true if the bottom four cards in the hand form two pair
+	 */
+
+	public boolean isLowTwoPair() {
+		if (   this.cards.get(1).rankEquals(this.cards.get(2)) 
+		    && this.cards.get(3).rankEquals(this.cards.get(4))) {
+			this.value = HandValue.TWO_PAIR;
+			this.tieBreakers.clear();
+			this.tieBreakers.add(this.cards.get(1));
+			this.tieBreakers.add(this.cards.get(3));
+			this.tieBreakers.add(this.cards.get(0));
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Determine whether this hand is a one pair,
+	 * assuming it does not have a higher value
+	 * @return true if this hand is one pair
+	 */
+	public boolean isOnePair() {
+		return     this.isOnePairOne()
+				|| this.isOnePairTwo()
+				|| this.isOnePairThree()
+				|| this.isOnePairFour();
+	}
+	
+	/**
+	 * Test whether the top two cards form a pair
+	 * @return true if the top two cards form a pair
+	 */
+	public boolean isOnePairOne() {
+		if (this.cards.get(0).rankEquals(this.cards.get(1))) {
+			this.value = HandValue.ONE_PAIR;
+			this.tieBreakers.clear();
+			this.tieBreakers.add(this.cards.get(0));
+			this.tieBreakers.add(this.cards.get(2));
+			this.tieBreakers.add(this.cards.get(3));
+			this.tieBreakers.add(this.cards.get(4));
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Test whether the second and third highest cards form a pair
+	 * @return true if the second and third highest cards form a pair
+	 */
+	public boolean isOnePairTwo() {
+		if (this.cards.get(1).rankEquals(this.cards.get(2))) {
+			this.value = HandValue.ONE_PAIR;
+			this.tieBreakers.clear();
+			this.tieBreakers.add(this.cards.get(1));
+			this.tieBreakers.add(this.cards.get(0));
+			this.tieBreakers.add(this.cards.get(3));
+			this.tieBreakers.add(this.cards.get(4));
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Test whether the third and fourth highest cards form a pair
+	 * @return true if the third and fourth highest cards form a pair
+	 */
+	public boolean isOnePairThree() {
+		if (this.cards.get(2).rankEquals(this.cards.get(3))) {
+			this.value = HandValue.ONE_PAIR;
+			this.tieBreakers.clear();
+			this.tieBreakers.add(this.cards.get(2));
+			this.tieBreakers.add(this.cards.get(0));
+			this.tieBreakers.add(this.cards.get(1));
+			this.tieBreakers.add(this.cards.get(4));
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Test whether the lowest two cards form a pair
+	 * @return true if the lowest two cards form a pair
+	 */
+		public boolean isOnePairFour() {
+		if (this.cards.get(3).rankEquals(this.cards.get(4))) {
+			this.value = HandValue.ONE_PAIR;
+			this.tieBreakers.clear();
+			this.tieBreakers.add(this.cards.get(3));
+			this.tieBreakers.add(this.cards.get(0));
+			this.tieBreakers.add(this.cards.get(1));
+			this.tieBreakers.add(this.cards.get(2));
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * If the hand has no higher rank, assign in a value of No Pair
+	 * @return true
+	 */
+	public boolean isNoPair() {
+		this.value = HandValue.NO_PAIR;
+		this.tieBreakers.clear();
+		for (Card c : this.cards) {
+			this.tieBreakers.add(c);
+		}
+		return true;
+	}
+
+	/** 
+	 * Return the difference between the rank of this
+	 * hand and the rank of o, the other hand
+	 * @param other the other hand
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	public int compareTo(Hand other) {
+		if (this.value == null) {
+			this.evaluateWithCurrentRanks();
+		}
+		if (other.value == null) {
+			other.evaluateWithCurrentRanks();
+		}
+		int comp = this.value.compareTo(other.value);
+		if (comp != 0) {
+			return comp * 100;
+		} else {
+			for (int i = 0; i < this.tieBreakers.size(); i++) {
+				comp = other.tieBreakers.get(i).compareTo(this.tieBreakers.get(i));
+				if (comp != 0) {
+					return comp;
 				}
 			}
 			return 0;
 		}
-	};
-	
-	public String toString() {
-		String ans = "";
-		if (this.BestCardsInHand.size() > 0) {
-			ans += "Original cards in hand: ";
-			for (Card c : this.BestCardsInHand) {
-				ans += c.toString() + " ";
-			}
-			ans += "\n";
-		}
-		ans += "Cards in hand: ";
-		for (Card c : this.CardsInHand) {
-			ans += c.toString() + " ";
-		}
-		/*
-		if (this.bScored) {
-			ans += "\n" + this.HandScore.getHandStrength();
-		}
-		*/
-		return ans;
 	}
 
+	public String toString() {
+		String handStr = "";
+		for (Card c : this.tieBreakers) {
+			handStr += c + " ";
+		}
+		if (this.value != null) {
+			handStr += " " + this.getValue() + " with tiebreakers ";
+		}
+		return handStr;
+	}
+	
 }
+

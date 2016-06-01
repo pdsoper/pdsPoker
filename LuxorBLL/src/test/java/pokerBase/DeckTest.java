@@ -5,184 +5,99 @@ package pokerBase;
 
 import static org.junit.Assert.*;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.ArrayList;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import exceptions.DeckException;
-import exceptions.HandException;
-import pokerEnums.eHandStrength;
+import pokerEnums.HandValue;
+import pokerEnums.Rank;
+import pokerEnums.Suit;
+import pokerExceptions.DeckException;
 
 /**
- * @author Bert.Gibbons
+ * @author paulsoper
  *
  */
 public class DeckTest {
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
+	
+	@Test
+	public final void testConstructor() {
+		Deck dk = new Deck();
+		assertEquals(dk.nCards(), 52);
+		// System.out.println("Basic deck");
+		// System.out.println(dk);
 	}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
+	
+	@Test
+	public final void testConstructorJokers() {
+		int nJokers = 2;
+		Deck dk = new Deck(nJokers);
+		assertEquals(dk.nCards(), 54);
+		// System.out.println("Deck with " + nJokers + " Jokers" );
+		// System.out.println(dk);
 	}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@Before
-	public void setUp() throws Exception {
+	
+	@Test
+	public final void testConstructorWilds() {
+		ArrayList<WildCard> wcal = new ArrayList<WildCard>();
+		wcal.add(new WildCard(Rank.TWO, Suit.HEARTS));
+		wcal.add(new WildCard(Rank.TWO, Suit.CLUBS));
+		wcal.add(new WildCard(Rank.TWO, Suit.SPADES));
+		wcal.add(new WildCard(Rank.TWO, Suit.DIAMONDS));
+		Deck dk = new Deck(wcal);
+		assertEquals(dk.nCards(), 52);
+		// System.out.println("Deck with deuces wild" );
+		// System.out.println(dk);
 	}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@After
-	public void tearDown() throws Exception {
+		
+	@Test
+	public final void testConstructorJokerWilds() {
+		int nJokers = 2;
+		ArrayList<WildCard> wcal = new ArrayList<WildCard>();
+		wcal.add(new WildCard(Rank.TWO, Suit.HEARTS));
+		wcal.add(new WildCard(Rank.TWO, Suit.CLUBS));
+		wcal.add(new WildCard(Rank.TWO, Suit.SPADES));
+		wcal.add(new WildCard(Rank.TWO, Suit.DIAMONDS));
+		Deck dk = new Deck(nJokers, wcal);
+		assertEquals(dk.nCards(), 54);
+		// System.out.println("Deck with " + nJokers + " Jokers and deuces wild" );
+		// System.out.println(dk);
 	}
-
+		
 	/**
-	 * Test to check to see if the .draw() method actually returns a Card
-	 * @throws DeckException
+	 * Test method for {@link pokerBase.Deck#dealOne()}.
 	 */
 	@Test
-	public void DeckDrawIsCard() throws DeckException {
-		Deck d = new Deck();
-		Object o = d.Draw();
-
-		if (!(o instanceof Card)) {
-			fail("Object drawn from deck isn't card");
-		}
+	public final void testDraw() throws DeckException {
+		Deck dk = new Deck();
+		dk.draw();
+		assertEquals(dk.nCards(), 51);
 	}
-
-	/**
-	 * Test to check to see if an overdraw (draw more cards than in deck)
-	 * throws the right exception
-	 * @throws Exception 
-	 * @throws DeckException
-	 */
-
-	@Test(expected = DeckException.class)
-	public void DeckOverDraw() throws Exception {
-		Deck d = new Deck();
-		Card c = null;
-		for (int i = 0; i < 100; i++) {
-			c = d.Draw();		
-		}
+	
+	@Test
+	public final void testDrawThree() throws DeckException {
+		Deck dk = new Deck();
+		dk.draw(3);
+		assertEquals(dk.nCards(), 49);
 	}
+	
 
+	@Test (expected = DeckException.class)
+	public final void testDrawException() throws DeckException {
+		Deck dk = new Deck();
+		dk.draw(dk.nCards());
+		dk.draw();
+		assertEquals(dk.nCards(), 51);
+	}
+	
 	/**
-	 * I can't call 'GetDeckSize' directly- the method is private! I'm calling
-	 * GetDeckSize using Java Reflections
-	 * 
-	 * All those crazy 'catch' blocks... using reflections can potentially throw
-	 * a bunch of errors... method not found, instance not found, etc The
-	 * 'catch' blocks are required to catch any of these generated exceptions
+	 * Test method for {@link pokerBase.Deck#nCards()}.
 	 */
 	@Test
-	public void NoramlDeckSizeTest() {
-		int iExpectedValue = 51;
-		int iActualValue;
-
-		try {
-			//	Load the Class into 'c'
-			Class<?> c = Class.forName("pokerBase.Deck");
-			//	Create a new instance 't' from the no-arg Deck constructor
-			Object t = c.newInstance();
-			//	Load 'mDraw' with the 'Draw' method (no args);
-			Method mDraw = c.getDeclaredMethod("Draw", null);
-			//	Load 'mGetDeckSize' with the 'GetDeckSize' method
-			Method mGetDeckSize = c.getDeclaredMethod("GetDeckSize", null);
-			//	Change the visibilty of 'GetDeckSize' to true *Good Grief!*
-			mGetDeckSize.setAccessible(true);
-
-			//	invoke 'Draw'
-			Object oDraw = mDraw.invoke(t, null);
-			
-			//	invoke 'GetDeckSize'
-			Object oGetDeckSize = mGetDeckSize.invoke(t, null);
-
-			iActualValue = ((Integer) oGetDeckSize).intValue();
-
-			assertEquals(iExpectedValue, iActualValue);
-		} catch (ClassNotFoundException x) {
-			x.printStackTrace();
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		}
+	public final void testNCards() {
+		Deck dk = new Deck();
+		assertEquals(dk.nCards(), 52);
+		assertFalse(dk.nCards() == 51);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	public void OneJokerDeckSizeTest() {
-		int iNbrOfJokers = 1;
-		int iExpectedValue = 52;
-		int iActualValue;
 
-		try {
-			Class<?> c = Class.forName("pokerBase.Deck");
-			Constructor<?> cons = c.getConstructor(int.class);
-			Object t = cons.newInstance(iNbrOfJokers);
-
-			Method mDraw = c.getDeclaredMethod("Draw", null);
-			Method mGetDeckSize = c.getDeclaredMethod("GetDeckSize", null);
-			mGetDeckSize.setAccessible(true);
-
-			Object oDraw = mDraw.invoke(t, null);
-			Object oGetDeckSize = mGetDeckSize.invoke(t, null);
-
-			iActualValue = ((Integer) oGetDeckSize).intValue();
-
-			assertEquals(iExpectedValue, iActualValue);
-		} catch (ClassNotFoundException x) {
-			x.printStackTrace();
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		}
-	}	
 }
