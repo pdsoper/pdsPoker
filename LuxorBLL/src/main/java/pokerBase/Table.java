@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import pokerEnums.CardVisibility;
 import pokerExceptions.DeckException;
+import pokerExceptions.TiedHandsException;
 
 /**
  * @author paulsoper
@@ -43,11 +44,16 @@ public class Table implements Serializable {
 	}
 	
 	public int getDealerPosition() {
-		return dealerPosition;
+		if (this.dealerPosition < 0) {
+			this.dealerPosition = this.nextActivePlayerPositionAfter(
+				(int) Math.floor((double) this.maxPlayers * Math.random()));
+		}
+		return this.dealerPosition;
 	}
 
-	public void setDealerPosition(int dealerPosition) {
-		this.dealerPosition = dealerPosition;
+	public void setNextDealerPosition() {
+		this.dealerPosition = this.nextActivePlayerPositionAfter(this.dealerPosition);
+		this.currentPlayerPosition = this.nextActivePlayerPositionAfter(this.dealerPosition);
 	}
 
 	public boolean isGameInProgress() {
@@ -68,22 +74,21 @@ public class Table implements Serializable {
 	}
 	
 	/**
-	 * Find the next player who has not folded, and update
-	 * currentPlayerPosition accordingly.
-	 * @return the next active player
+	 * Find the position of the next active player who has not folded.
+	 * @param startPos
+	 * @return the position of the next player
 	 */
-	public Player nextActivePlayer() {
+	public int nextActivePlayerPositionAfter(int startPos) {
 		int position = 0;
 		Player aPlayer = null;
 		for (int i = 1; i <= this.maxPlayers; i++) {
-			position = (this.currentPlayerPosition + i) % this.maxPlayers;
+			position = (startPos + i) % this.maxPlayers;
 			aPlayer = this.getPlayerAtPosition(position);
 			if (aPlayer != null && aPlayer.isActive()) {
 				break;
 			}
 		}
-		this.currentPlayerPosition = position;
-		return aPlayer;
+		return position;
 	}
 	
 	public boolean isCardVisibleToPlayer(Card aCard, Player aPlayer) {
@@ -91,17 +96,28 @@ public class Table implements Serializable {
 				|| owner.get(aCard).equals(aPlayer);
 	}
 	
-	public int winningPosition() {
+	public int winningPosition() throws TiedHandsException {
 		int winIdx = -1;
+		int secondIdx = -1;
 		if (this.gameOver) {
-			Hand bestSoFar = Hand.WorstHand();
+			Hand best = Hand.WorstHand();
+			Hand secondBest = Hand.WorstHand();
 			for (int i = 0; i < this.maxPlayers; i++) {
 				Player aPlayer = this.players[i];
-				if (aPlayer != null && aPlayer.isActive() 
-						&& aPlayer.getHand().compareTo(bestSoFar) > 0) {
-					bestSoFar = aPlayer.getHand();
-					winIdx = i;
+				if (aPlayer != null && aPlayer.isActive()) {
+					if (aPlayer.getHand().compareTo(best) > 0) {
+						secondBest = best;
+						secondIdx = winIdx;
+						best = aPlayer.getHand();
+						winIdx = i;
+					} else if (aPlayer.getHand().compareTo(secondBest) > 0) {
+						secondBest = aPlayer.getHand();
+						secondIdx = i;
+					}
 				}
+			} 
+			if (best.compareTo(secondBest) == 0) {
+				throw new TiedHandsException(winIdx, secondIdx, best, secondBest);
 			}
 		}
 		return winIdx;
@@ -110,15 +126,10 @@ public class Table implements Serializable {
 	public void startNewGame(Game aGame, Deck aDeck) {
 		this.currentGame = aGame;
 		this.currentDeck = aDeck;
-		if (this.dealerPosition < 0) {
-			this.dealerPosition = (int) Math.floor((double) this.maxPlayers * Math.random());
-		} else {
-			this.dealerPosition++;
-		}
-		this.currentPlayerPosition = (this.dealerPosition + 1) % this.maxPlayers;
 		for (Player aPlayer : this.players) {
 			aPlayer.reset();
 		}
+		this.setNextDealerPosition();
 		this.currentDeal = 0;
 		this.gameInProgress = true;
 		this.gameOver = false;
@@ -135,27 +146,33 @@ public class Table implements Serializable {
 		Card aCard;
 		Player aPlayer;
 		for (CardDraw cDraw : cDraws) {
-			switch (cDraw.getDestination()) {
-			case Community:
-				aCard = this.currentDeck.draw();
-				this.communityCards.add(aCard);
-				this.visibility.put(aCard, cDraw.getVisibility());
-				break;
-			case Players:
-				for (int i = 1; i <= this.maxPlayers; i++) {
-					aPlayer = this.players[(this.dealerPosition + i) % this.maxPlayers];
-					if (aPlayer != null && aPlayer.isActive()) {
-						aCard = this.currentDeck.draw();
-						aPlayer.getHand().addCard(aCard);
-						this.visibility.put(aCard, cDraw.getVisibility());
-						this.owner.put(aCard, aPlayer);
-					}
-				}
-				break;
-			}
+			this.executeDraw(cDraw);
 		}
 		this.currentDeal++;
 		return true;
+	}
+	
+	public void executeDraw(CardDraw cDraw) throws DeckException {
+		Card aCard;
+		Player aPlayer;
+		switch (cDraw.getDestination()) {
+		case Community:
+			aCard = this.currentDeck.draw();
+			this.communityCards.add(aCard);
+			this.visibility.put(aCard, cDraw.getVisibility());
+			break;
+		case Players:
+			for (int i = 1; i <= this.maxPlayers; i++) {
+				aPlayer = this.players[(this.dealerPosition + i) % this.maxPlayers];
+				if (aPlayer != null && aPlayer.isActive()) {
+					aCard = this.currentDeck.draw();
+					aPlayer.getHand().addCard(aCard);
+					this.visibility.put(aCard, cDraw.getVisibility());
+					this.owner.put(aCard, aPlayer);
+				}
+			}
+			break;
+		}
 	}
 	
 	public boolean evaluateHands() {
@@ -172,7 +189,15 @@ public class Table implements Serializable {
 	}
 	
 	public String toString() {
-		int winIdx = this.winningPosition();
+		int winIdx = -1;
+		int tidx1 = -1;
+		int tidx2 = -1;
+		try {
+			winIdx = this.winningPosition();
+		} catch (TiedHandsException e) {
+			tidx1 = e.getPosition1();
+			tidx2 = e.getPosition2();
+		}
 		String tableStr = "Table\n";
 		tableStr += "Dealer = Player[" + this.dealerPosition + "] " + this.players[this.dealerPosition].getName()  + "\n";
 		tableStr += this.currentGame.getName() + ", deal " + this.currentDeal + "\n";
@@ -184,11 +209,19 @@ public class Table implements Serializable {
 			tableStr += "\n";
 		}
 		for (int i = 0; i < this.maxPlayers; i++) {
-			tableStr += (i == winIdx) ? "* " : "  ";
-			tableStr += "Player[" + i + "] = " + this.players[i] + "\n";
+			if (i == winIdx) {
+				tableStr += "*";
+			} else if (i == tidx1 || i == tidx2) {
+				tableStr += "t";
+			} else {
+				tableStr += " ";
+			}
+			tableStr += " Player[" + i + "] = " + this.players[i] + "\n";
 		}
 		if (winIdx >= 0) {
 			tableStr += "* = winner\n";
+		} else if (tidx1 >= 0) {
+			tableStr += "t = tied\n";
 		}
 		return tableStr;
 	}

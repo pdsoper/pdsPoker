@@ -29,7 +29,7 @@ public class TableTest {
 		while (tab.dealCards()) {
 			System.out.println(tab);
 		}
-		tab.winningPosition();
+		tab.evaluateHands();
 		System.out.println(tab);
 		assertTrue(true);
 	}
