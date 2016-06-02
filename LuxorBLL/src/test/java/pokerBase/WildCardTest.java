@@ -37,9 +37,9 @@ public class WildCardTest {
 		WildCard wc = new WildCard(Rank.TWO, Suit.HEARTS);
 		// System.out.println("testWildCardRankSuit");
 		// System.out.println(wc);
-		assertEquals(wc.getRank(), Rank.TWO);
+		assertTrue(wc.getRank() == null);
 		assertEquals(wc.getFaceRank(), Rank.TWO);
-		assertEquals(wc.getSuit(), Suit.HEARTS);
+		assertTrue(wc.getSuit() == null);
 		assertEquals(wc.getFaceSuit(), Suit.HEARTS);
 	}
 
@@ -60,9 +60,10 @@ public class WildCardTest {
 	@Test
 	public final void toStringTest() {
 		WildCard wc = new WildCard(Rank.TWO, Suit.HEARTS);
+		System.out.print("WildCard : " + wc + " -> ");
 		wc.setSuit(Suit.DIAMONDS);
 		wc.setRank(Rank.ACE);
-		System.out.println("WildCard : " + wc);
+		System.out.println(wc);
 		assertTrue(true);
 	}
 

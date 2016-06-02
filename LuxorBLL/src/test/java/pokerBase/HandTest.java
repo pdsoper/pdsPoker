@@ -74,7 +74,7 @@ public class HandTest {
 			aceOfSpades, kingOfSpades, nineOfClubs, nineOfClubs, wildTwoOfHearts);
 	
 	private static Hand twoWildThreeOfaKind = new Hand(
-			twoOfDiamonds, aceOfSpades, fourOfSpades, joker1, joker2); 
+			twoOfDiamonds, kingOfSpades, fourOfSpades, joker1, joker2); 
 	
 	private static Hand threeWildFiveOfaKind = new Hand(
 			sevenOfClubs, sevenOfDiamonds, joker1, wildTwoOfClubs, wildTwoOfDiamonds);
