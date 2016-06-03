@@ -6,13 +6,10 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
+import pokerEnums.GameOption;
+
 public class GameTest {
 
-	@Test
-	public void initializationTest() {
-		assertEquals(Game.GameMap.size(), 2);
-	}
-	
 	@Test
 	public void testGetName() {
 		assertEquals(Game.FiveCardStud().getName(), "Five Card Stud");
@@ -26,7 +23,7 @@ public class GameTest {
 
 	@Test
 	public void testNDeals() {
-		assertEquals(Game.FiveCardStud().nDeals(), 4);
+		assertEquals(GameOption.FiveCardStud.getGame().nDeals(), 4);
 	}
 
 	@Test

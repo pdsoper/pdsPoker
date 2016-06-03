@@ -45,14 +45,20 @@ public class Table implements Serializable {
 	
 	public int getDealerPosition() {
 		if (this.dealerPosition < 0) {
-			this.dealerPosition = this.nextActivePlayerPositionAfter(
-				(int) Math.floor((double) this.maxPlayers * Math.random()));
+			ArrayList<Player> actualPlayers = new ArrayList<Player>();
+			for (int i = 0; i < this.maxPlayers; i++) {
+				if (this.players[i] != null) {
+					actualPlayers.add(this.players[i]);
+				}
+			}
+			int randInt = (int) Math.floor((double) actualPlayers.size() * Math.random());
+			this.dealerPosition = actualPlayers.get(randInt).getPosition();
 		}
 		return this.dealerPosition;
 	}
 
 	public void setNextDealerPosition() {
-		this.dealerPosition = this.nextActivePlayerPositionAfter(this.dealerPosition);
+		this.dealerPosition = this.nextActivePlayerPositionAfter(this.getDealerPosition());
 		this.currentPlayerPosition = this.nextActivePlayerPositionAfter(this.dealerPosition);
 	}
 
@@ -64,12 +70,17 @@ public class Table implements Serializable {
 		return gameOver;
 	}
 
-	public Player getPlayerAtPosition(int position) {
+	public Player getPlayer(int position) {
 		return this.players[position];
 	}
 	
-	public void addPlayerToTable(Player aPlayer, int position) {
+	public int getCurrentDeal() {
+		return currentDeal;
+	}
+
+	public void addPlayer(Player aPlayer, int position) {
 		aPlayer.setActive(!this.gameInProgress);
+		aPlayer.setPosition(position);
 		this.players[position] = aPlayer;
 	}
 	
@@ -83,7 +94,7 @@ public class Table implements Serializable {
 		Player aPlayer = null;
 		for (int i = 1; i <= this.maxPlayers; i++) {
 			position = (startPos + i) % this.maxPlayers;
-			aPlayer = this.getPlayerAtPosition(position);
+			aPlayer = this.getPlayer(position);
 			if (aPlayer != null && aPlayer.isActive()) {
 				break;
 			}
@@ -127,7 +138,9 @@ public class Table implements Serializable {
 		this.currentGame = aGame;
 		this.currentDeck = aDeck;
 		for (Player aPlayer : this.players) {
-			aPlayer.reset();
+			if (aPlayer != null) {
+				aPlayer.reset();
+			}
 		}
 		this.setNextDealerPosition();
 		this.currentDeal = 0;
@@ -143,8 +156,6 @@ public class Table implements Serializable {
 			return false;
 		}
 		ArrayList<CardDraw> cDraws = this.currentGame.getDeal(this.currentDeal);
-		Card aCard;
-		Player aPlayer;
 		for (CardDraw cDraw : cDraws) {
 			this.executeDraw(cDraw);
 		}
@@ -154,7 +165,6 @@ public class Table implements Serializable {
 	
 	public void executeDraw(CardDraw cDraw) throws DeckException {
 		Card aCard;
-		Player aPlayer;
 		switch (cDraw.getDestination()) {
 		case Community:
 			aCard = this.currentDeck.draw();
@@ -163,7 +173,7 @@ public class Table implements Serializable {
 			break;
 		case Players:
 			for (int i = 1; i <= this.maxPlayers; i++) {
-				aPlayer = this.players[(this.dealerPosition + i) % this.maxPlayers];
+				Player aPlayer = this.players[(this.dealerPosition + i) % this.maxPlayers];
 				if (aPlayer != null && aPlayer.isActive()) {
 					aCard = this.currentDeck.draw();
 					aPlayer.getHand().addCard(aCard);
@@ -199,7 +209,7 @@ public class Table implements Serializable {
 			tidx2 = e.getPosition2();
 		}
 		String tableStr = "Table\n";
-		tableStr += "Dealer = Player[" + this.dealerPosition + "] " + this.players[this.dealerPosition].getName()  + "\n";
+		tableStr += "Dealer = " + this.players[this.dealerPosition].getName() + "\n";
 		tableStr += this.currentGame.getName() + ", deal " + this.currentDeal + "\n";
 		if (this.communityCards.size() > 0) {
 			tableStr += "Community = ";
@@ -209,14 +219,16 @@ public class Table implements Serializable {
 			tableStr += "\n";
 		}
 		for (int i = 0; i < this.maxPlayers; i++) {
-			if (i == winIdx) {
-				tableStr += "*";
-			} else if (i == tidx1 || i == tidx2) {
-				tableStr += "t";
-			} else {
-				tableStr += " ";
+			if (this.players[i] != null) {
+				if (i == winIdx) {
+					tableStr += "*";
+				} else if (i == tidx1 || i == tidx2) {
+					tableStr += "t";
+				} else {
+					tableStr += " ";
+				}
+				tableStr += " " + this.players[i] + "\n";
 			}
-			tableStr += " Player[" + i + "] = " + this.players[i] + "\n";
 		}
 		if (winIdx >= 0) {
 			tableStr += "* = winner\n";

@@ -1,0 +1,35 @@
+Five of a Kind
+1 tie breaker - any of the 5 matching cards
+
+Straight Flush
+1 tie breaker - highest card
+
+Four of a Kind
+1 tie breaker - any of the 4 matching cards, then the remaining card
+
+Full House
+2 tie breakers - one of the 3 matching cards, then one of the pair
+
+Flush
+5 tie breakers - cards in descending order
+
+Straight
+1 tie breaker - highest card of the straight
+
+Three of a Kind
+3 tie breakers - one of the 3 matching cards, then the other two cards
+in descending order
+
+Two Pair
+3 tie breakers - one of the higher pair, one of the lower pair, then the
+remaining card
+
+One Pair
+4 tie breakers - one of the pair, then the remaining cards in descending
+order
+
+No Pair
+5 tie breakers - all five cards in descending order
+
+None (Fold)
+No tie breakers - loses to all other hands

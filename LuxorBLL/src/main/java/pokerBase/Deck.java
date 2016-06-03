@@ -10,7 +10,7 @@ import pokerExceptions.DeckException;
 
 /**
  * 
- * @author Bert.Gibbons
+ * @author paulsoper
  *
  */
 public class Deck implements Serializable  {
@@ -48,8 +48,7 @@ public class Deck implements Serializable  {
 	 */
 	public Deck(ArrayList<WildCard> wildCards) {
 		this();
-		this.replaceWithWild(wildCards);
-		Collections.shuffle(this.cards);	
+		this.replaceWithWild(wildCards);	
 	}
 	
 	/**
@@ -67,24 +66,17 @@ public class Deck implements Serializable  {
 	}
 	
 	/**
-	 * Set to wild the cards in this deck that match those in wildCards  
+	 * Replace cards in this deck with matching wildCards
 	 * @param wildCards
 	 */
 	private void replaceWithWild(ArrayList<WildCard> wildCards) {
-		for (WildCard wc : wildCards) {
-			for (Card c : this.cards) {
-				if (c.isWild()) {
-					continue;
-				}
-				if (c.getRank() == wc.getFaceRank()
-						&& c.getSuit() == wc.getFaceSuit()) {
-					this.cards.remove(c);
-					this.cards.add(wc);
-					break;
+		for (WildCard wild : wildCards) {
+			for (int i = 0; i < this.nCards(); i++) {
+				if (this.cards.get(i).faceRankAndFaceSuitEquals(wild)) {
+					this.cards.set(i, wild);
 				}
 			}
 		}
-		Collections.shuffle(this.cards);
 	}
 	
 	/**
@@ -109,11 +101,11 @@ public class Deck implements Serializable  {
 	 * @throws DeckException
 	 */
 	public ArrayList<Card> draw(int nCards) throws DeckException {
-		ArrayList<Card> cal = new ArrayList<Card>(); 
+		ArrayList<Card> cards = new ArrayList<Card>(); 
 		for (int i = 0; i < nCards; i ++) {
-			cal.add(this.draw());
+			cards.add(this.draw());
 		}
-		return cal;
+		return cards;
 	}
 
 	/**

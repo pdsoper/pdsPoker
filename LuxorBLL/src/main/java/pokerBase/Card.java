@@ -92,6 +92,11 @@ public class Card implements Comparable<Card>,  Serializable {
 		return this.rankEquals(otherCard) && this.suitEquals(otherCard);
 	}
 	
+	public boolean faceRankAndFaceSuitEquals(Card otherCard) {
+		return this.getFaceRank() == otherCard.getFaceRank()
+				&& this.getFaceSuit() == otherCard.getFaceSuit();
+	}
+	
 	/**
 	 * Compare the ranks of two cards for sorting in descending order
 	 * @param o the comparison card
@@ -107,6 +112,5 @@ public class Card implements Comparable<Card>,  Serializable {
 	public String toString() {
 		return this.getRank().toString() + this.getSuit().toString();
 	}
-	
 	
 }

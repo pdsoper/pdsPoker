@@ -13,20 +13,50 @@ import pokerExceptions.DeckException;
 public class TableTest {
 
 	@Test
-	public void toStringTest() throws DeckException {
+	public void toStringTest2() throws DeckException {
 		int nPlayers = 4;
 		Table tab = new Table(nPlayers);
-		tab.addPlayerToTable(new Player("Chris "), 0);
-		tab.addPlayerToTable(new Player("Tim   "), 1);
-		tab.addPlayerToTable(new Player("Andrew"), 2);
-		tab.addPlayerToTable(new Player("Thomas"), 3);
-		ArrayList<WildCard> wcal = new ArrayList<WildCard>(4);
-		wcal.add(new WildCard(Rank.TWO, Suit.CLUBS));
-		wcal.add(new WildCard(Rank.TWO, Suit.DIAMONDS));
-		wcal.add(new WildCard(Rank.TWO, Suit.HEARTS));
-		wcal.add(new WildCard(Rank.TWO, Suit.SPADES));
-		tab.startNewGame(Game.FiveCardStud(), new Deck(2, wcal));
+		tab.addPlayer(new Player("Chris "), 0);
+		tab.addPlayer(new Player("Tim   "), 1);
+		tab.addPlayer(new Player("Andrew"), 2);
+		tab.addPlayer(new Player("Thomas"), 3);
+		tab.startNewGame(Game.FiveCardDraw(), new Deck(2, WildCard.OneEyedJacks()));
 		while (tab.dealCards()) {
+			System.out.println(tab);
+		}
+		tab.evaluateHands();
+		System.out.println(tab);
+		assertTrue(true);
+	}
+
+	@Test
+	public void toStringTest1() throws DeckException {
+		int nPlayers = 4;
+		Table tab = new Table(nPlayers);
+		tab.addPlayer(new Player("Chris "), 0);
+		tab.addPlayer(new Player("Tim   "), 1);
+		tab.addPlayer(new Player("Andrew"), 3);
+		tab.startNewGame(Game.FiveCardStud(), new Deck(2, WildCard.Deuces()));
+		while (tab.dealCards()) {
+			System.out.println(tab);
+		}
+		tab.evaluateHands();
+		System.out.println(tab);
+		assertTrue(true);
+	}
+
+	@Test
+	public void toStringTest3() throws DeckException {
+		int nPlayers = 4;
+		Table tab = new Table(nPlayers);
+		tab.addPlayer(new Player("Chris "), 0);
+		tab.addPlayer(new Player("Tim   "), 1);
+		tab.addPlayer(new Player("Andrew"), 3);
+		tab.startNewGame(Game.FiveCardStud(), new Deck(2, WildCard.Deuces()));
+		while (tab.dealCards()) {
+			if (tab.getCurrentDeal() == 4) {
+				tab.getPlayer(1).fold();
+			}
 			System.out.println(tab);
 		}
 		tab.evaluateHands();

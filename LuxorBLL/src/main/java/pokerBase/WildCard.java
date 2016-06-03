@@ -1,11 +1,50 @@
 package pokerBase;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import pokerEnums.Rank;
 import pokerEnums.Suit;
 
 public class WildCard extends Card implements Serializable {
+	
+	public static final ArrayList<WildCard> Deuces() {
+		ArrayList<WildCard> wilds = new ArrayList<WildCard>(4);
+		wilds.add(new WildCard(Rank.TWO, Suit.CLUBS));
+		wilds.add(new WildCard(Rank.TWO, Suit.DIAMONDS));
+		wilds.add(new WildCard(Rank.TWO, Suit.HEARTS));
+		wilds.add(new WildCard(Rank.TWO, Suit.SPADES));
+		return wilds;
+	}
+	
+	public static final ArrayList<WildCard> AcesAndEights() {
+		ArrayList<WildCard> wilds = new ArrayList<WildCard>(8);
+		wilds.add(new WildCard(Rank.ACE, Suit.CLUBS));
+		wilds.add(new WildCard(Rank.ACE, Suit.DIAMONDS));
+		wilds.add(new WildCard(Rank.ACE, Suit.HEARTS));
+		wilds.add(new WildCard(Rank.ACE, Suit.SPADES));
+		wilds.add(new WildCard(Rank.EIGHT, Suit.CLUBS));
+		wilds.add(new WildCard(Rank.EIGHT, Suit.DIAMONDS));
+		wilds.add(new WildCard(Rank.EIGHT, Suit.HEARTS));
+		wilds.add(new WildCard(Rank.EIGHT, Suit.SPADES));
+		return wilds;
+	}
+	
+	public static final ArrayList<WildCard> OneEyedJacks() {
+		ArrayList<WildCard> wilds = new ArrayList<WildCard>(2);
+		wilds.add(new WildCard(Rank.JACK, Suit.HEARTS));
+		wilds.add(new WildCard(Rank.JACK, Suit.SPADES));
+		return wilds;
+	}
+	
+	public static final ArrayList<WildCard> CombineWilds(ArrayList<ArrayList<WildCard>> wildLists) {
+		ArrayList<WildCard> wilds = new ArrayList<WildCard>();
+		for (ArrayList<WildCard> wcl : wildLists) {
+			wilds.addAll(wcl);
+		}
+		return wilds;
+	}
 	
 	public WildCard() {
 	}

@@ -206,7 +206,7 @@ public class PokerTableController {
 		mainApp.messageSend(act);
 	}
 
-	public void Handle_TableState(Table HubPokerTable) {
+	public void handleTable(Table aTable) {
 
 		lblPos1Name.setText("");
 		lblPos2Name.setText("");

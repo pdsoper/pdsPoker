@@ -8,6 +8,7 @@ public class Player implements Serializable {
 
 	private String name;
 	private boolean active = false;
+	private int position;
 	private Hand currentHand;
 	
 	public Player(String name) {
@@ -31,10 +32,19 @@ public class Player implements Serializable {
 		this.active = active;
 	}
 
-	public void fold() {
-		this.active = false;
+	public int getPosition() {
+		return position;
 	}
 
+	public void setPosition(int position) {
+		this.position = position;
+	}
+	
+	public void fold() {
+		this.active = false;
+		this.currentHand.resetHand();
+	}
+	
 	public void reset() {
 		this.active = true;
 		this.currentHand.resetHand();
@@ -42,11 +52,11 @@ public class Player implements Serializable {
 		
 	@Override
 	public String toString() {
-		String playerStr = "Player : " + this.name;
+		String playerStr = "Player[" + this.position + "] " + this.name + " ";
 		if (this.active) {
-			playerStr += " (active) " + this.getHand();
+			playerStr += this.getHand();
 		} else {
-			playerStr += " (inactive)";
+			playerStr += "Folded";
 		}
 		return playerStr;
 	}

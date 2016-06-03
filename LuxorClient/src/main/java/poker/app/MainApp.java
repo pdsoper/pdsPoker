@@ -253,7 +253,7 @@ public class MainApp extends Application {
 				else if (message instanceof Table)
 				{				
 					//	The table changed...  poker table should react to new state of table
-					pokerController.Handle_TableState((Table)message);
+					pokerController.handleTable((Table) message);
 					
 					//	This will refresh the info box in the table... will go away when game
 					//	is finished
@@ -262,7 +262,7 @@ public class MainApp extends Application {
 				else if (message instanceof Table)
 				{
 					try {
-						pokerController.Handle_Table((Table)message);
+						pokerController.handleTable((Table) message);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
