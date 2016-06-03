@@ -104,6 +104,10 @@ public class Hand implements Comparable<Hand>, Serializable {
 		}
 	}
 
+	public ArrayList<Card> getCards() {
+		return cards;
+	}
+
 	/**
 	 * Number of cards in this hand
 	 * @return the number of cards in this hand

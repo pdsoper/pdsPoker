@@ -51,15 +51,11 @@ import poker.app.MainApp;
 import pokerBase.Action;
 import pokerBase.Card;
 import pokerBase.Deck;
-import pokerBase.GamePlay;
-import pokerBase.GamePlayPlayerHand;
 import pokerBase.Hand;
 import pokerBase.Player;
 import pokerBase.Table;
-import pokerEnums.eAction;
-import pokerEnums.eGame;
-import pokerEnums.ePlayerPosition;
-import pokerExceptions.HandException;
+import pokerEnums.ActionOption;
+import pokerEnums.GameOption;
 
 public class PokerTableController {
 
@@ -153,56 +149,44 @@ public class PokerTableController {
 		this.mainApp = mainApp;
 	}
 
-	public void setlblNumberOfPlayers(Table tbl) {
-		Iterator it = tbl.getHashPlayers().entrySet().iterator();
-		txtPlayerArea.setText("Table ID: " + tbl.getTableID().toString() + '\n');
-		while (it.hasNext()) {
-			Map.Entry pair = (Map.Entry) it.next();
-			Player p = (Player) pair.getValue();
-			txtPlayerArea.appendText("Player: " + p.getPlayerName() + "      Position: " + p.getiPlayerPosition()
-					+ "   ClientID: " + p.getiPokerClientID() + '\n');
-		}
-	}
-	
 	@FXML
 	private void handlePlay() {
 	}
 
-	@FXML
-	public void GetGameState() {
-		Action act = new Action(eAction.GameState, mainApp.getPlayer());
-		mainApp.messageSend(act);
-	}
-
 	public void btnSitLeave_Click(ActionEvent event) {
 		ToggleButton btnSitLeave = (ToggleButton) event.getSource();
-		int iPlayerPosition = 0;
+		int iPlayerPosition = -1;
 		if (btnSitLeave.isSelected()) {
 			switch (btnSitLeave.getId().toString()) {
 			case "btnPos1SitLeave":
-				iPlayerPosition = ePlayerPosition.ONE.getiPlayerPosition();
 				hBoxPos1.getChildren().clear();
+				iPlayerPosition = 0;
 				break;
 			case "btnPos2SitLeave":
-				iPlayerPosition = ePlayerPosition.TWO.getiPlayerPosition();
 				hBoxPos2.getChildren().clear();
+				iPlayerPosition = 1;
 				break;
 			case "btnPos3SitLeave":
-				iPlayerPosition = ePlayerPosition.THREE.getiPlayerPosition();
 				hBoxPos3.getChildren().clear();
+				iPlayerPosition = 2;
 				break;
 			case "btnPos4SitLeave":
-				iPlayerPosition = ePlayerPosition.FOUR.getiPlayerPosition();
 				hBoxPos4.getChildren().clear();
+				iPlayerPosition = 3;
 				break;
 			}
 		} else {
-			iPlayerPosition = 0;
+			iPlayerPosition = -1;
 		}
 
-		mainApp.getPlayer().setiPlayerPosition(iPlayerPosition);
-		Action act = new Action(btnSitLeave.isSelected() ? eAction.Sit : eAction.Leave, mainApp.getPlayer());
-
+		mainApp.getPlayer().setPosition(iPlayerPosition);
+		Action act = new Action();
+		if (btnSitLeave.isSelected()) {
+			act.setActionOption(ActionOption.Sit);
+		} else {
+			act.setActionOption(ActionOption.Leave);
+		}
+		act.setPosition(iPlayerPosition);
 		mainApp.messageSend(act);
 	}
 
@@ -215,8 +199,6 @@ public class PokerTableController {
 		
 		this.showInitialButtons();
 
-		//scanInputControls(OuterBorderPane, "SitLeave",true);
-		
 		btnPos1SitLeave.setVisible(true);
 		btnPos2SitLeave.setVisible(true);
 		btnPos3SitLeave.setVisible(true);
@@ -227,9 +209,9 @@ public class PokerTableController {
 		btnPos3SitLeave.setText(btnPos3SitLeave.isSelected() ? "Leave" : "Sit");
 		btnPos4SitLeave.setText(btnPos4SitLeave.isSelected() ? "Leave" : "Sit");
 
-		btnStartGame.setDisable(HubPokerTable.getHashPlayers().size() > 0 ? false : true);
-
+		btnStartGame.setDisable(aTable.isGameInProgress());
 		
+		/*
 		FadeButton(btnStartGame);
 		Iterator it = HubPokerTable.getHashPlayers().entrySet().iterator();
 		while (it.hasNext()) {
@@ -282,9 +264,10 @@ public class PokerTableController {
 				break;
 			}
 		}
+		*/
 	}
 
-	public void Handle_GameState(GamePlay HubGamePlay) throws HandException 
+/*	public void Handle_GameState(GamePlay HubGamePlay) throws HandException 
 	{
 		imgViewDealerButtonPos1.setVisible(false);
 		imgViewDealerButtonPos2.setVisible(false);
@@ -320,7 +303,7 @@ public class PokerTableController {
 		}
 
 	}
-	
+	*/
 	public void showInitialButtons() {
 		btnStartGame.setVisible(true);
 		btnDeal.setVisible(false);
@@ -334,13 +317,13 @@ public class PokerTableController {
 		btnFlowPanePos4.setVisible(false);
 	}
 	
-	public void showButtons(GamePlay aGamePlay) {
-		int myPos = this.mainApp.getPlayer().getiPlayerPosition();
+	public void showButtons(Table aTable) {
+		int myPos = this.mainApp.getPlayer().getPosition();
 		btnFlowPanePos1.setVisible(false);
 		btnFlowPanePos2.setVisible(false);
 		btnFlowPanePos3.setVisible(false);
 		btnFlowPanePos4.setVisible(false);
-		if (aGamePlay.isGameInProgress()) {
+		if (aTable.isGameInProgress()) {
 			btnStartGame.setVisible(false);
 			btnDeal.setVisible(true);	
 			switch (myPos) {
@@ -363,8 +346,7 @@ public class PokerTableController {
 		}
 	}
 	
-	public void showCards(GamePlay aGamePlay, Player aPlayer) {
-		GamePlayPlayerHand gpph = aGamePlay.playerGPPH(aPlayer);
+	public void showCards(Table aTable, Player aPlayer) {
 		double ivSize = 50.0;
 		String imgPath = "/img/";
 		String imgExt = ".png";
@@ -376,7 +358,7 @@ public class PokerTableController {
 		cbiv.setPreserveRatio(true);
 		HBox hb = null;
 		Player myself = this.mainApp.getPlayer();
-		switch (aPlayer.getiPlayerPosition()) {
+		switch (aPlayer.getPosition()) {
 		case 1:
 			hb = hBoxPos1;
 			break;
@@ -391,15 +373,9 @@ public class PokerTableController {
 			break;
 		}
 		hb.getChildren().clear();
-		ArrayList<Card> cards = null;
-		if (aGamePlay.winner() == null) {
-			cards = gpph.getHand().getCardsInHand(); 
-		} else {
-			cards = gpph.getHand().getBestCardsInHand();
-		}
-		for (Card c : cards) {
-			if (gpph.playerCardVisible(myself, c)) {
-				imgUrl = imgPath + c.getiCardNbr() + imgExt;
+		for (Card c : aPlayer.getHand().getCards()) {
+			if (aTable.isCardVisibleToPlayer(c, myself)) {
+				imgUrl = imgPath + c.getImageNum() + imgExt;
 				img = new Image(imgUrl);
 			} else {
 				img = cardBack;
@@ -407,39 +383,37 @@ public class PokerTableController {
 			ImageView iv = new ImageView(img); 
 			iv.setFitHeight(ivSize);
 			iv.setPreserveRatio(true);
-			hb.getChildren().add(iv);
-			
+			hb.getChildren().add(iv);	
 		}
 	}
 	
 	
 	@FXML
 	void btnStart_Click(ActionEvent event) {
-		Action act = new Action(eAction.StartGame, mainApp.getPlayer());		
-		int iRuleNbr = Integer.parseInt(mainApp.getRuleName().replace("PokerGame", ""));
-		eGame Game = eGame.getGame(iRuleNbr);
-		act.seteGame(Game);
+		Action act = new Action(ActionOption.StartGame, mainApp.getPlayer().getPosition());;
+		GameOption Game = GameOption.FiveCardStud;
+		act.setGameOpt(Game);
 		
 		mainApp.messageSend(act);
 	}
 
 	@FXML
 	void btnDeal_Click(ActionEvent event) {
-		Action act = new Action(eAction.Deal, mainApp.getPlayer());
+		Action act = new Action(ActionOption.Deal, mainApp.getPlayer().getPosition());
 		mainApp.messageSend(act);
 	}
 	
 	@FXML
 	public void btnFold_Click(ActionEvent event) {
 		Button btnFold = (Button) event.getSource();
-		Action act = new Action(eAction.Fold, mainApp.getPlayer());
+		Action act = new Action(ActionOption.Fold, mainApp.getPlayer().getPosition());
 		mainApp.messageSend(act);
 	}
 
 	@FXML
 	public void btnCheck_Click(ActionEvent event) {
 		Button btnFold = (Button) event.getSource();
-		Action act = new Action(eAction.Fold, mainApp.getPlayer());
+		Action act = new Action(ActionOption.Check, mainApp.getPlayer().getPosition());
 		mainApp.messageSend(act);
 	}
 

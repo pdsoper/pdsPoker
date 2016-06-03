@@ -84,6 +84,10 @@ public class Table implements Serializable {
 		this.players[position] = aPlayer;
 	}
 	
+	public void removePlayer(int position) {
+		this.players[position] = null;
+	}
+	
 	/**
 	 * Find the position of the next active player who has not folded.
 	 * @param startPos
@@ -134,25 +138,40 @@ public class Table implements Serializable {
 		return winIdx;
 	}
 	
-	public void startNewGame(Game aGame, Deck aDeck) {
-		this.currentGame = aGame;
-		this.currentDeck = aDeck;
+	public void reset() {
+		this.visibility.clear();
+		this.owner.clear();
 		for (Player aPlayer : this.players) {
 			if (aPlayer != null) {
 				aPlayer.reset();
 			}
 		}
+	}
+	
+	public void startNewGame(Game aGame, Deck aDeck) {
+		this.reset();
+		this.currentGame = aGame;
+		this.currentDeck = aDeck;
 		this.setNextDealerPosition();
 		this.currentDeal = 0;
 		this.gameInProgress = true;
 		this.gameOver = false;
 	}
 	
+	public void endGame() {
+		this.gameInProgress = false;
+		this.gameOver = true;
+		this.evaluateHands();
+		for (Card c : this.visibility.keySet()) {
+			if (this.owner.get(c).isActive()) {
+				this.visibility.put(c, CardVisibility.Everyone);
+			}
+		}
+	}
+	
 	public boolean dealCards() throws DeckException {
 		if (this.currentDeal >= this.currentGame.nDeals()) {
-			this.gameInProgress = false;
-			this.gameOver = true;
-			this.evaluateHands();
+			this.endGame();
 			return false;
 		}
 		ArrayList<CardDraw> cDraws = this.currentGame.getDeal(this.currentDeal);
@@ -211,6 +230,12 @@ public class Table implements Serializable {
 		String tableStr = "Table\n";
 		tableStr += "Dealer = " + this.players[this.dealerPosition].getName() + "\n";
 		tableStr += this.currentGame.getName() + ", deal " + this.currentDeal + "\n";
+		if (winIdx > -1) {
+			tableStr += this.getPlayer(winIdx).getName() + " wins!\n";
+		} else if (tidx1 > -1 || tidx2 > 0) {
+			tableStr += this.getPlayer(tidx1).getName() + " and " +
+					this.getPlayer(tidx2).getName() + " are tied. (Unusual!)\n";
+		}
 		if (this.communityCards.size() > 0) {
 			tableStr += "Community = ";
 			for (Card c : this.communityCards) {

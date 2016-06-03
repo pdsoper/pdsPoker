@@ -90,7 +90,7 @@ public class LuxorServer extends Application {
             	System.out.println("Data Received By Server: " + data.toString());
                 //messages.appendText(data.toString() + "\n");
                 Action act = DeSerializeAction(data.toString());
-                messages.appendText("Action: " + act.getAction() + "\n");
+                messages.appendText("Action: " + act.getActionOption() + "\n");
                 try {
 					connection.send("Your turn");
 				} catch (Exception e) {

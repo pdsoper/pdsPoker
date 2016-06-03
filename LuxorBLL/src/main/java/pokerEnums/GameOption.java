@@ -13,6 +13,21 @@ public enum GameOption {
 		this.gameStr = str;
 	}
 	
+	public String valueString() {
+		switch (this) {
+		case FiveCardDraw:
+			return "FiveCardDraw";
+		case FiveCardStud:
+			return "FiveCardStud";
+		default:
+			return "";
+		}
+	}
+	
+	public boolean isDefault() {
+		return this == FiveCardStud;
+	}
+	
 	public Game getGame() {
 		switch (this) {
 		case FiveCardDraw:

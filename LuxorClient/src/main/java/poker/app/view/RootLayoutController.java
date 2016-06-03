@@ -1,29 +1,22 @@
 package poker.app.view;
 
-import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleGroup;
-import javafx.stage.FileChooser;
 import poker.app.MainApp;
-import pokerBase.Card;
-import pokerEnums.eGame;
-import pokerEnums.Rank;
-import pokerEnums.Suit;
+import pokerEnums.BettingOption;
+import pokerEnums.GameOption;
+import pokerEnums.JokerOption;
+import pokerEnums.WildCardOption;
 
 
 /**
@@ -31,7 +24,7 @@ import pokerEnums.Suit;
  * application layout containing a menu bar and space where other JavaFX
  * elements can be placed.
  * 
- * @author Marco Jakob
+ * @author paulsoper
  */
 public class RootLayoutController implements Initializable {
 
@@ -39,18 +32,27 @@ public class RootLayoutController implements Initializable {
 	private MainApp mainApp;
 
 	@FXML
-	private MenuBar mb;
+	private MenuBar mbar;
 
 	@FXML
-	private Menu mnuGame;
+	private Menu mnuGame = new Menu();
+	
+	@FXML
+	private Menu mnuBet = new Menu();
+			
+	@FXML
+	private Menu mnuJoker = new Menu();
+					
+	@FXML
+	private Menu mnuWild = new Menu();
 
 
 	public String getRuleName()
 	{	
 		String strRuleID = null;
-		for (Menu m: mb.getMenus())
+		for (Menu m: mbar.getMenus())
 		{
-			if (m.getText() == "Pick Game")
+			if (m.getText() == "Game")
 			{
 				for (MenuItem mi: m.getItems())
 				{
@@ -71,111 +73,98 @@ public class RootLayoutController implements Initializable {
 	}
 	
 	public void initialize(URL location, ResourceBundle resources) {
-
-		BuildMenus();
+		this.buildMenus();
 	}
 	
-	public void BuildMenus()
-	{
+	public void buildMenus() {
+		this.buildGameMenu(0);
+		this.buildJokerMenu(1);
+		this.buildWildMenu(2);
+		this.buildBetMenu(3);
+	}
+    	
+	public void buildGameMenu(int idx) {
 		
-		Menu mnuGame = new Menu();
-		mnuGame.setText("Pick Game");
-		mb.getMenus().add(0,mnuGame);
+		mnuGame.setText("Game");
+		mbar.getMenus().add(idx,mnuGame);
 				
 		ToggleGroup tglGrpGame = new ToggleGroup();
 		
-		for (eGame eGame : eGame.values()) {
-			RadioMenuItem rmi = new RadioMenuItem(eGame.toString());
-			rmi.setId("PokerGame" + String.valueOf(eGame.getGame()));
+		for (GameOption gameOpt : GameOption.values()) {
+			RadioMenuItem rmi = new RadioMenuItem(gameOpt.toString());
+			rmi.setId(gameOpt.valueString());
 			rmi.setToggleGroup(tglGrpGame);
-			if (eGame.getDefault())
-			{
+			if (gameOpt.isDefault()) {
 				rmi.setSelected(true);
 			}
 			mnuGame.getItems().add(rmi);
 		}
-		
-		Menu mnuBet = new Menu();
-		mnuBet.setText("Betting");
-		mb.getMenus().add(1,mnuBet);
-		ToggleGroup tglBet = new ToggleGroup();
-		
-		RadioMenuItem rmi1 = new RadioMenuItem("No Limit");
-		rmi1.setSelected(true);
-		rmi1.setToggleGroup(tglBet);
-		RadioMenuItem rmi2 = new RadioMenuItem("Pot Limit");
-		rmi2.setToggleGroup(tglBet);
-		
-		mnuBet.getItems().add(rmi1);
-		mnuBet.getItems().add(rmi2);
-		
-		//	TODO - Lab #5...  Add a new menu item that will display the betting rules...
-		//	Two choices:
-		//	No Limit (set this as default)
-		//	Pot Limit (this is NOT the default)
-		//	Group them together with a Toggle Group
-		//	Write a method to return which is selected.. .check out getRuleName()
-
 	}
-    
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+		
+	public void buildBetMenu(int idx) {
+		
+		mnuBet.setText("Betting");
+		mbar.getMenus().add(idx,mnuBet);
+				
+		ToggleGroup tglGrpBet = new ToggleGroup();
+		
+		for (BettingOption betOpt : BettingOption.values()) {
+			RadioMenuItem rmi = new RadioMenuItem(betOpt.toString());
+			rmi.setId(betOpt.valueString());
+			rmi.setToggleGroup(tglGrpBet);
+			if (betOpt.isDefault()) {
+				rmi.setSelected(true);
+			}
+			mnuBet.getItems().add(rmi);
+		}
+	}
+		
+	public void buildJokerMenu(int idx) {
+		
+		mnuJoker.setText("Jokers");
+		mbar.getMenus().add(idx, mnuJoker);
+				
+		ToggleGroup tglGrpJoker = new ToggleGroup();
+		
+		for (JokerOption jokerOpt : JokerOption.values()) {
+			RadioMenuItem rmi = new RadioMenuItem(jokerOpt.toString());
+			rmi.setId(jokerOpt.valueString());
+			rmi.setToggleGroup(tglGrpJoker);
+			if (jokerOpt.isDefault()) {
+				rmi.setSelected(true);
+			}
+			mnuJoker.getItems().add(rmi);
+		}
+	}
+		
+	public void buildWildMenu(int idx) {
+		
+		mnuWild.setText("Wild Cards");
+		mbar.getMenus().add(idx, mnuWild);
+				
+		ToggleGroup tglGrpWild = new ToggleGroup();
+		
+		for (WildCardOption wildOpt : WildCardOption.values()) {
+			RadioMenuItem rmi = new RadioMenuItem(wildOpt.toString());
+			rmi.setId(wildOpt.valueString());
+			rmi.setToggleGroup(tglGrpWild);
+			if (wildOpt.isDefault()) {
+				rmi.setSelected(true);
+			}
+			mnuWild.getItems().add(rmi);
+		}
+	}
+			
 	public void setMainApp(MainApp mainApp) {
 		this.mainApp = mainApp;
 	}
 
-
 	@FXML
 	private void handleAbout() {
 		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("AddressApp");
+		alert.setTitle("Poker");
 		alert.setHeaderText("About");
-		alert.setContentText("Author: Bert Gibbons");
+		alert.setContentText("Poker as implemented in CISC 181");
 
 		alert.showAndWait();
 	}
@@ -187,9 +176,5 @@ public class RootLayoutController implements Initializable {
 	private void handleExit() {
 		System.exit(0);
 	}
-
-
-
-	
 
 }

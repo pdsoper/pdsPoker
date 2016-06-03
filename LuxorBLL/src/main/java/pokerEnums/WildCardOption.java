@@ -16,6 +16,19 @@ public enum WildCardOption {
 		this.optionStr = optionStr;
 	}
 	
+	public String valueString() {
+		switch (this) {
+		case Deuces:
+			return "Deuces";
+		case OneEyedJacks:
+			return "OneEyedJacks";
+		case AcesAndEights:
+			return "AcesAndEights";
+		default:
+			return "";
+		}
+	}
+	
 	public ArrayList<WildCard> getWildCards() {
 		switch (this) {
 		case Deuces:
@@ -27,6 +40,10 @@ public enum WildCardOption {
 		default:
 			return new ArrayList<WildCard>();
 		}
+	}
+	
+	public boolean isDefault() {
+		return false;
 	}
 	
 	@Override
